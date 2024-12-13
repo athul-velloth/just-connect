@@ -51,6 +51,7 @@ class SizeConstant {
   static double otpFieldTextSize = 22.sp;
 
   static double topPadding = getHeightWithScreen(25);
+  static double iconSize = getHeightWithScreen(24);
 
   static double getHeightWithScreen(double value) {
     return ScreenUtil().orientation == Orientation.portrait ? value.h : value.w;
