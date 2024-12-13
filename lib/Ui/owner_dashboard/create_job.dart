@@ -156,9 +156,7 @@ class _CreateJobState extends State<CreateJob> {
                   bgColor: ColorConstant.outletButtonColor,
                   btnHeight: SizeConstant.getHeightWithScreen(48),
                   onTap: () {
-                    if(_ownerController.faltNoController.text.isNotEmpty && _ownerController.dateController.text.isNotEmpty && _ownerController.typeController.text.isNotEmpty && _ownerController.nameController.text.isNotEmpty){
-                      
-                    }
+                    if(_ownerController.faltNoController.text.isNotEmpty && _ownerController.dateController.text.isNotEmpty && _ownerController.typeController.text.isNotEmpty && _ownerController.nameController.text.isNotEmpty){}
                     // String pattern =
                     //     r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
                     // RegExp regex = RegExp(pattern);

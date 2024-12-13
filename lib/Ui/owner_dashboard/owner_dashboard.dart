@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 import 'package:justconnect/Ui/owner_dashboard/create_job.dart';
+import 'package:justconnect/Ui/owner_dashboard/job_card.dart';
 import 'package:justconnect/constants/color_constants.dart';
 import 'package:justconnect/constants/size_constants.dart';
 import 'package:justconnect/constants/strings.dart';
+import 'package:justconnect/controller/owner_controller.dart';
 
 class OwnerDashboard extends StatefulWidget {
   const OwnerDashboard({super.key});
@@ -15,6 +17,7 @@ class OwnerDashboard extends StatefulWidget {
 }
 
 class _OwnerDashboardState extends State<OwnerDashboard> {
+  final OwnerController _ownerController = Get.put(OwnerController());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,8 +59,28 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
       ),
       body: SafeArea(
         top: true,
-        child: Column(
-          children: [],
+        child: Padding(
+          padding: EdgeInsets.only(
+              left: SizeConstant.horizontalPadding,
+              right: SizeConstant.horizontalPadding),
+          child: Column(
+            children: [
+              SizedBox(height: SizeConstant.getHeightWithScreen(20)),
+              Expanded(
+                child: ListView.separated(
+                    separatorBuilder: (context, index) {
+                      return const SizedBox(
+                        height: 5,
+                      );
+                    },
+                    shrinkWrap: true,
+                    itemCount: _ownerController.jobList.length,
+                    itemBuilder: (context, index) {
+                      return JobCard(model: _ownerController.jobList[index]);
+                    }),
+              )
+            ],
+          ),
         ),
       ),
     );
