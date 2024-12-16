@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:justconnect/Ui/job_detail_page.dart';
+import 'package:justconnect/Ui/owner_dashboard/owner_dashboard.dart';
 import 'package:justconnect/constants/strings.dart';
 import 'package:justconnect/controller/worker_controller.dart';
 
@@ -25,11 +26,10 @@ class _HomeState extends State<Home> {
       top: false,
       child: Scaffold(
         backgroundColor: ColorConstant.white,
-        body:
-        Padding(
-        padding: EdgeInsets.only(
-        left: SizeConstant.getHeightWithScreen(15),
-    right: SizeConstant.getHeightWithScreen(15)),
+        body: Padding(
+          padding: EdgeInsets.only(
+              left: SizeConstant.getHeightWithScreen(15),
+              right: SizeConstant.getHeightWithScreen(15)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -55,7 +55,7 @@ class _HomeState extends State<Home> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        Get.to(() => const Home());
+                        Get.to(() => const OwnerDashboard());
                       },
                       child: Icon(
                         Icons.exit_to_app,
@@ -82,7 +82,6 @@ class _HomeState extends State<Home> {
                       },
                       child: Container(
                         margin: EdgeInsets.only(
-
                           top: SizeConstant.getHeightWithScreen(10),
                           bottom: SizeConstant.getHeightWithScreen(12),
                         ),
@@ -128,7 +127,8 @@ class _HomeState extends State<Home> {
                                       ),
                                     ),
                                     SizedBox(
-                                      height: SizeConstant.getHeightWithScreen(4),
+                                      height:
+                                          SizeConstant.getHeightWithScreen(4),
                                     ),
                                     Text(
                                       'Flat No: ${job.flatNo}',
@@ -140,7 +140,8 @@ class _HomeState extends State<Home> {
                                       ),
                                     ),
                                     SizedBox(
-                                      height: SizeConstant.getHeightWithScreen(4),
+                                      height:
+                                          SizeConstant.getHeightWithScreen(4),
                                     ),
                                     Text(
                                       'Type of Job: ${job.jobType}',
