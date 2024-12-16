@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:intl/intl.dart';
 import 'package:justconnect/Ui/job_detail_page.dart';
 import 'package:justconnect/Ui/owner_dashboard/owner_dashboard.dart';
 import 'package:justconnect/constants/strings.dart';
@@ -93,9 +94,9 @@ class _HomeState extends State<Home> {
                         ),
                         decoration: BoxDecoration(
                           color: ColorConstant.white,
-                          border: Border.all(color: ColorConstant.grey8),
-                          borderRadius: BorderRadius.all(Radius.circular(
-                              SizeConstant.getHeightWithScreen(15))),
+                          border: Border.all(color: ColorConstant.grey8, width: 2),
+                          borderRadius: BorderRadius.all(
+                              Radius.circular(SizeConstant.getHeightWithScreen(15))),
                           boxShadow: [
                             BoxShadow(
                               color: ColorConstant.shadowColor,
@@ -104,19 +105,47 @@ class _HomeState extends State<Home> {
                             )
                           ],
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Row(
-                            children: [
-                              CircleAvatar(
-                                radius: 30.0,
-                                backgroundImage: NetworkImage(job.ownerImage),
-                              ),
-                              const SizedBox(width: 16.0),
-                              Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            CircleAvatar(
+                              radius: 30.0,
+                              backgroundImage: NetworkImage(job.ownerImage),
+                            ),
+                            SizedBox(
+                              width: SizeConstant.getHeightWithScreen(16),
+                            ),
+                            Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            job.date,
+                                            style: TextStyle(
+                                              overflow: TextOverflow.ellipsis,
+                                              fontSize: SizeConstant.xSmallFont,
+                                              fontWeight: FontWeight.w500,
+                                              color: ColorConstant.grey26,
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: SizeConstant.getHeightWithScreen(5),
+                                        ),
+                                        Icon(
+                                          Icons.arrow_forward_ios,
+                                          color: ColorConstant.primaryColor,
+                                          size: SizeConstant.getHeightWithScreen(12),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: SizeConstant.getHeightWithScreen(5),
+                                    ),
                                     Text(
                                       job.fullName,
                                       style: TextStyle(
@@ -127,24 +156,10 @@ class _HomeState extends State<Home> {
                                       ),
                                     ),
                                     SizedBox(
-                                      height:
-                                          SizeConstant.getHeightWithScreen(4),
+                                      height: SizeConstant.getHeightWithScreen(4),
                                     ),
                                     Text(
-                                      'Flat No: ${job.flatNo}',
-                                      style: TextStyle(
-                                        overflow: TextOverflow.visible,
-                                        fontSize: SizeConstant.xSmallFont,
-                                        fontWeight: FontWeight.w500,
-                                        color: ColorConstant.grey26,
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height:
-                                          SizeConstant.getHeightWithScreen(4),
-                                    ),
-                                    Text(
-                                      'Type of Job: ${job.jobType}',
+                                      job.jobType,
                                       style: TextStyle(
                                         overflow: TextOverflow.visible,
                                         fontSize: SizeConstant.xSmallFont,
@@ -153,10 +168,8 @@ class _HomeState extends State<Home> {
                                       ),
                                     ),
                                   ],
-                                ),
-                              ),
-                            ],
-                          ),
+                                ))
+                          ],
                         ),
                       ),
                     );
