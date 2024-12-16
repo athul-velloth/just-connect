@@ -153,18 +153,18 @@ class _SignUpState extends State<SignUp> {
                     child: ElevatedButton(
                       onPressed: () {
                         setState(() {
-                          _userType = 'Worker';
+                          _userType = 'Maid';
                         });
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: _userType == 'Worker'
+                        backgroundColor: _userType == 'Maid'
                             ? Colors.blue
                             : Colors.white, // Change color
-                        foregroundColor: _userType == 'Worker'
+                        foregroundColor: _userType == 'Maid'
                             ? Colors.white
                             : Colors.black, // Text color
                       ),
-                      child: const Text('Worker'),
+                      child: const Text('Maid'),
                     ),
                   ),
                 ],
