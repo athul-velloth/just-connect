@@ -82,7 +82,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                     padding: EdgeInsets.zero,
                     separatorBuilder: (context, index) {
                       return SizedBox(
-                        height: SizeConstant.getHeightWithScreen(5),
+                        height: SizeConstant.getHeightWithScreen(10),
                       );
                     },
                     shrinkWrap: true,
