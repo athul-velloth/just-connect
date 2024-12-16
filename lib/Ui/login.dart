@@ -2,13 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:justconnect/Ui/owner_dashboard/owner_dashboard.dart';
 import 'package:justconnect/Ui/signup.dart';
 import 'package:justconnect/constants/color_constants.dart';
 import 'package:justconnect/constants/size_constants.dart';
 
 import '../widget/commontextInputfield.dart';
 import '../widget/common_button.dart';
-import 'home.dart';
+import 'worker_dashboard/home.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -117,6 +118,8 @@ class _LoginState extends State<Login> {
                       
                       final username = emailController.text;
                       final password = passwordController.text;
+                      Get.to(() =>
+                      const Home());
                       if (username.isEmpty || password.isEmpty) {
                         // Show error if fields are empty
                         ScaffoldMessenger.of(context).showSnackBar(
