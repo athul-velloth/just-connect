@@ -25,11 +25,10 @@ class _HomeState extends State<Home> {
       top: false,
       child: Scaffold(
         backgroundColor: ColorConstant.white,
-        body:
-        Padding(
-        padding: EdgeInsets.only(
-        left: SizeConstant.getHeightWithScreen(15),
-    right: SizeConstant.getHeightWithScreen(15)),
+        body: Padding(
+          padding: EdgeInsets.only(
+              left: SizeConstant.getHeightWithScreen(15),
+              right: SizeConstant.getHeightWithScreen(15)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -82,15 +81,14 @@ class _HomeState extends State<Home> {
                       },
                       child: Container(
                         margin: EdgeInsets.only(
-
                           top: SizeConstant.getHeightWithScreen(10),
                           bottom: SizeConstant.getHeightWithScreen(12),
                         ),
                         padding: EdgeInsets.only(
-                          left: SizeConstant.getHeightWithScreen(5),
-                          right: SizeConstant.getHeightWithScreen(5),
-                          top: SizeConstant.getHeightWithScreen(5),
-                          bottom: SizeConstant.getHeightWithScreen(5),
+                          left: SizeConstant.getHeightWithScreen(10),
+                          right: SizeConstant.getHeightWithScreen(12),
+                          top: SizeConstant.getHeightWithScreen(10),
+                          bottom: SizeConstant.getHeightWithScreen(12),
                         ),
                         decoration: BoxDecoration(
                           color: ColorConstant.white,
@@ -128,7 +126,8 @@ class _HomeState extends State<Home> {
                                       ),
                                     ),
                                     SizedBox(
-                                      height: SizeConstant.getHeightWithScreen(4),
+                                      height:
+                                          SizeConstant.getHeightWithScreen(4),
                                     ),
                                     Text(
                                       'Flat No: ${job.flatNo}',
@@ -140,7 +139,8 @@ class _HomeState extends State<Home> {
                                       ),
                                     ),
                                     SizedBox(
-                                      height: SizeConstant.getHeightWithScreen(4),
+                                      height:
+                                          SizeConstant.getHeightWithScreen(4),
                                     ),
                                     Text(
                                       'Type of Job: ${job.jobType}',

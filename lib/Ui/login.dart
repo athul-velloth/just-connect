@@ -32,7 +32,7 @@ class _LoginState extends State<Login> {
             children: [
               _header(context),
               _inputField(context),
-               SizedBox(),
+              SizedBox(),
               _signup(context),
             ],
           ),
@@ -57,22 +57,6 @@ class _LoginState extends State<Login> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // CommonTextInputField(
-        //   textInputType: TextInputType.emailAddress,
-        //   showLabel: false,
-        //   height: SizeConstant.getHeightWithScreen(55),
-        //   controller: emailController,
-        //   hintText: "Enter Email",
-        //   isAteriskRequired: false,
-        //   enableInteractiveSelection: false,
-        //   onChanged: (p0) {
-        //     setState(() {});
-        //   },
-        //   fillColor: Colors.purple.withOpacity(0.1),
-        //   borderRadius: 18,
-        //   prefixIcon: const Icon(Icons.person)
-        //
-        // ),
         TextField(
           decoration: InputDecoration(
               hintText: "Email",
@@ -83,7 +67,7 @@ class _LoginState extends State<Login> {
               filled: true,
               prefixIcon: const Icon(Icons.person)),
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: SizeConstant.getHeightWithScreen(10)),
         TextField(
           decoration: InputDecoration(
             hintText: "Password",
@@ -96,11 +80,11 @@ class _LoginState extends State<Login> {
           ),
           obscureText: true,
         ),
-        const SizedBox(height: 40),
+        SizedBox(height: SizeConstant.getHeightWithScreen(40)),
         CommonButton(
             bgColor: ColorConstant.outletButtonColor,
             btnHeight: SizeConstant.getHeightWithScreen(55),
-            borderRadius: 20.0,
+            borderRadius: SizeConstant.getHeightWithScreen(20.0),
             onTap: () {
               String pattern =
                   r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
@@ -144,7 +128,9 @@ class _LoginState extends State<Login> {
       children: [
         const Text("Dont have an account? "),
         TextButton(
-            onPressed: () {},
+            onPressed: () {
+              Get.to(() => const SignUp());
+            },
             child: const Text(
               "Sign Up",
               style: TextStyle(color: Colors.purple),
@@ -152,106 +138,4 @@ class _LoginState extends State<Login> {
       ],
     );
   }
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     backgroundColor: ColorConstant.white,
-  //     body: SafeArea(
-  //       top: true,
-  //       child: Padding(
-  //         padding: EdgeInsets.symmetric(
-  //             horizontal: SizeConstant.getHeightWithScreen(16),
-  //             vertical: MediaQuery.of(context).viewPadding.top),
-  //         child: SingleChildScrollView(
-  //           padding: const EdgeInsets.only(bottom: 10),
-  //           child: Column(
-  //             children: [
-  //               SizedBox(height: SizeConstant.getHeightWithScreen(100)),
-  //               Text(
-  //                 "Login",
-  //                 style: TextStyle(
-  //                     color: ColorConstant.black,
-  //                     fontSize: SizeConstant.largeFont),
-  //               ),
-  //               SizedBox(height: SizeConstant.getHeightWithScreen(20)),
-  //
-  //               CommonTextInputField(
-  //                 textInputType: TextInputType.emailAddress,
-  //                 showLabel: false,
-  //                 height: SizeConstant.getHeightWithScreen(50),
-  //                 controller: emailController,
-  //                 hintText: "Enter Email",
-  //                 isAteriskRequired: false,
-  //                 enableInteractiveSelection: false,
-  //                 onChanged: (p0) {
-  //                   setState(() {});
-  //                 },
-  //
-  //               ),
-  //               SizedBox(height: SizeConstant.getHeightWithScreen(10)),
-  //               CommonTextInputField(
-  //                 textInputType: TextInputType.visiblePassword,
-  //                 showLabel: false,
-  //                 height: SizeConstant.getHeightWithScreen(50),
-  //                 controller: passwordController,
-  //                 hintText: "Enter Password",
-  //                 isAteriskRequired: false,
-  //                 enableInteractiveSelection: false,
-  //                 onChanged: (p0) {
-  //                   setState(() {});
-  //                 },
-  //               ),
-  //               SizedBox(height: SizeConstant.getHeightWithScreen(10)),
-  //               CommonButton(
-  //                   bgColor: ColorConstant.outletButtonColor,
-  //                   btnHeight: SizeConstant.getHeightWithScreen(48),
-  //                   onTap: () {
-  //                     String pattern =
-  //                         r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
-  //                     RegExp regex = RegExp(pattern);
-  //
-  //                     final username = emailController.text;
-  //                     final password = passwordController.text;
-  //                     Get.to(() =>
-  //                     const Home());
-  //                     if (username.isEmpty || password.isEmpty) {
-  //                       // Show error if fields are empty
-  //                       ScaffoldMessenger.of(context).showSnackBar(
-  //                         const SnackBar(
-  //                             content: Text(
-  //                                 'Please enter both email and password')),
-  //                       );
-  //                     } else if (!regex.hasMatch(emailController.text.trim())) {
-  //                         ScaffoldMessenger.of(context).showSnackBar(
-  //                         const SnackBar(
-  //                             content: Text(
-  //                                 'Please enter valid email')),
-  //                       );
-  //                     }
-  //                     else {
-  //                       Get.to(() =>
-  //                       const Home());
-  //                     }
-  //                   },
-  //                   label: 'Login'),
-  //               SizedBox(height: SizeConstant.getHeightWithScreen(10)),
-  //               GestureDetector(
-  //                 onTap: () {
-  //                   Get.to(() => const SignUp());
-  //                 },
-  //                 child: Text(
-  //                   "Sign Up",
-  //                   style: TextStyle(
-  //                       color: ColorConstant.primaryColor,
-  //                       fontSize: SizeConstant.largeFont),
-  //                 ),
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
 }
