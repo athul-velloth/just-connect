@@ -94,9 +94,10 @@ class _HomeState extends State<Home> {
                         ),
                         decoration: BoxDecoration(
                           color: ColorConstant.white,
-                          border: Border.all(color: ColorConstant.grey8, width: 2),
-                          borderRadius: BorderRadius.all(
-                              Radius.circular(SizeConstant.getHeightWithScreen(15))),
+                          border:
+                              Border.all(color: ColorConstant.grey8, width: 2),
+                          borderRadius: BorderRadius.all(Radius.circular(
+                              SizeConstant.getHeightWithScreen(15))),
                           boxShadow: [
                             BoxShadow(
                               color: ColorConstant.shadowColor,
@@ -118,57 +119,59 @@ class _HomeState extends State<Home> {
                             ),
                             Expanded(
                                 child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
                                   children: [
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            job.date,
-                                            style: TextStyle(
-                                              overflow: TextOverflow.ellipsis,
-                                              fontSize: SizeConstant.xSmallFont,
-                                              fontWeight: FontWeight.w500,
-                                              color: ColorConstant.grey26,
-                                            ),
-                                          ),
+                                    Expanded(
+                                      child: Text(
+                                        job.date,
+                                        style: TextStyle(
+                                          overflow: TextOverflow.ellipsis,
+                                          fontSize: SizeConstant.xSmallFont,
+                                          fontWeight: FontWeight.w500,
+                                          color: ColorConstant.grey26,
                                         ),
-                                        SizedBox(
-                                          width: SizeConstant.getHeightWithScreen(5),
-                                        ),
-                                        Icon(
-                                          Icons.arrow_forward_ios,
-                                          color: ColorConstant.primaryColor,
-                                          size: SizeConstant.getHeightWithScreen(12),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      height: SizeConstant.getHeightWithScreen(5),
-                                    ),
-                                    Text(
-                                      job.fullName,
-                                      style: TextStyle(
-                                        overflow: TextOverflow.ellipsis,
-                                        fontSize: SizeConstant.mediumFont,
-                                        fontWeight: FontWeight.w600,
-                                        color: ColorConstant.black3,
                                       ),
                                     ),
                                     SizedBox(
-                                      height: SizeConstant.getHeightWithScreen(4),
+                                      width:
+                                          SizeConstant.getHeightWithScreen(5),
                                     ),
-                                    Text(
-                                      job.jobType,
-                                      style: TextStyle(
-                                        overflow: TextOverflow.visible,
-                                        fontSize: SizeConstant.xSmallFont,
-                                        fontWeight: FontWeight.w500,
-                                        color: ColorConstant.grey26,
-                                      ),
+                                    Icon(
+                                      Icons.arrow_forward_ios,
+                                      color: ColorConstant.primaryColor,
+                                      size:
+                                          SizeConstant.getHeightWithScreen(12),
                                     ),
                                   ],
-                                ))
+                                ),
+                                SizedBox(
+                                  height: SizeConstant.getHeightWithScreen(5),
+                                ),
+                                Text(
+                                  job.fullName,
+                                  style: TextStyle(
+                                    overflow: TextOverflow.ellipsis,
+                                    fontSize: SizeConstant.mediumFont,
+                                    fontWeight: FontWeight.w600,
+                                    color: ColorConstant.black3,
+                                  ),
+                                ),
+                                // SizedBox(
+                                //   height: SizeConstant.getHeightWithScreen(4),
+                                // ),
+                                // Text(
+                                //   job.jobType,
+                                //   style: TextStyle(
+                                //     overflow: TextOverflow.visible,
+                                //     fontSize: SizeConstant.xSmallFont,
+                                //     fontWeight: FontWeight.w500,
+                                //     color: ColorConstant.grey26,
+                                //   ),
+                                // ),
+                              ],
+                            ))
                           ],
                         ),
                       ),
