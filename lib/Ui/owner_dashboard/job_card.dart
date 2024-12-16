@@ -37,7 +37,7 @@ class JobCard extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: ColorConstant.white,
-          border: Border.all(color: ColorConstant.grey8),
+          border: Border.all(color: ColorConstant.grey8, width: 2),
           borderRadius: BorderRadius.all(
               Radius.circular(SizeConstant.getHeightWithScreen(15))),
           boxShadow: [

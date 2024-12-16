@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:justconnect/Ui/job_detail_page.dart';
+import 'package:justconnect/Ui/owner_dashboard/owner_dashboard.dart';
 import 'package:justconnect/constants/strings.dart';
 import 'package:justconnect/controller/worker_controller.dart';
 
@@ -54,7 +55,7 @@ class _HomeState extends State<Home> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        Get.to(() => const Home());
+                        Get.to(() => const OwnerDashboard());
                       },
                       child: Icon(
                         Icons.exit_to_app,
