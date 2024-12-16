@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 import 'package:justconnect/Ui/owner_dashboard/create_job.dart';
 import 'package:justconnect/Ui/owner_dashboard/job_card.dart';
+import 'package:justconnect/Ui/owner_dashboard/job_details.dart';
 import 'package:justconnect/Ui/worker_dashboard/home.dart';
 import 'package:justconnect/constants/color_constants.dart';
 import 'package:justconnect/constants/size_constants.dart';
@@ -88,7 +89,9 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                     shrinkWrap: true,
                     itemCount: _ownerController.jobList.length,
                     itemBuilder: (context, index) {
-                      return JobCard(model: _ownerController.jobList[index]);
+                      return GestureDetector(onTap: () {
+                        Get.to(()=>JobDetails(job: _ownerController.jobList[index]));
+                      },child: JobCard(model: _ownerController.jobList[index]));
                     }),
               ),
             )
