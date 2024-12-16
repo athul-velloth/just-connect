@@ -4,7 +4,7 @@ class ColorConstant {
   factory ColorConstant() {
     return ColorConstant();
   }
-  static var primaryColor = const Color(0xFFF8991D);
+  static var primaryColor = const Color(0xFF008DD4);
   static var cardBgColor = const Color(0xFFEB8600);
   static var white = const Color(0xFFFFFFFF);
   static var white1 = const Color(0xFF475677);
