@@ -30,47 +30,88 @@ class _CreateJobState extends State<CreateJob> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: ColorConstant.white,
-      appBar: AppBar(
-        title: Text(
-          Strings.createJob,
-          style: TextStyle(
-              color: ColorConstant.white,
-              fontSize: SizeConstant.largeFont,
-              fontWeight: FontWeight.w400),
-        ),
-      ),
-      body: SafeArea(
-        top: true,
-        child: Padding(
-          padding: EdgeInsets.only(
-              left: SizeConstant.horizontalPadding,
-              right: SizeConstant.horizontalPadding),
-          child: Column(
-            children: [
-              SizedBox(height: SizeConstant.getHeightWithScreen(20)),
-              Container(
-                width: SizeConstant.getHeightWithScreen(80),
-                height: SizeConstant.getHeightWithScreen(80),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: ColorConstant.primaryColor,
-                    width: SizeConstant.getHeightWithScreen(1),
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        backgroundColor: ColorConstant.white,
+        body: Column(
+          children: [
+            SizedBox(
+              height: MediaQuery.of(context).viewPadding.top,
+            ),
+            Padding(
+              padding: EdgeInsets.only(
+                  left: SizeConstant.getHeightWithScreen(15),
+                  top: SizeConstant.topPadding,
+                  right: SizeConstant.getHeightWithScreen(15)),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Container(
+                      height: SizeConstant.getHeightWithScreen(35),
+                      width: SizeConstant.getHeightWithScreen(35),
+                      padding: EdgeInsets.only(
+                          left: SizeConstant.getHeightWithScreen(12),
+                          bottom: SizeConstant.getHeightWithScreen(10),
+                          right: SizeConstant.getHeightWithScreen(9),
+                          top: SizeConstant.getHeightWithScreen(9)),
+                      decoration: BoxDecoration(
+                        color: ColorConstant.vibBgColor,
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(10),
+                        ),
+                      ),
+                      child: Icon(
+                        Icons.arrow_back_ios,
+                        color: ColorConstant.black,
+                        size: SizeConstant.getHeightWithScreen(16),
+                      ),
+                    ),
                   ),
-                ),
-                child: ClipOval(
-                  child: Image.network(
-                    widget.ownerImage,
-                    fit: BoxFit.cover,
-                    width: SizeConstant.getHeightWithScreen(40),
-                    height: SizeConstant.getHeightWithScreen(40),
+                  Padding(
+                    padding: EdgeInsets.only(
+                        left: SizeConstant.getHeightWithScreen(15)),
+                    child: Text(
+                      Strings.createJob,
+                      style: TextStyle(
+                        color: ColorConstant.black.withOpacity(0.88),
+                        fontSize: SizeConstant.largeFont,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
+                ],
+              ),
+            ),
+            SizedBox(height: SizeConstant.getHeightWithScreen(20)),
+            Container(
+              width: SizeConstant.getHeightWithScreen(80),
+              height: SizeConstant.getHeightWithScreen(80),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: ColorConstant.primaryColor,
+                  width: SizeConstant.getHeightWithScreen(1),
                 ),
               ),
-              SizedBox(height: SizeConstant.getHeightWithScreen(20)),
-              CommonTextInputField(
+              child: ClipOval(
+                child: Image.network(
+                  widget.ownerImage,
+                  fit: BoxFit.cover,
+                  width: SizeConstant.getHeightWithScreen(40),
+                  height: SizeConstant.getHeightWithScreen(40),
+                ),
+              ),
+            ),
+            SizedBox(height: SizeConstant.getHeightWithScreen(20)),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                  horizontal: SizeConstant.horizontalPadding),
+              child: CommonTextInputField(
                 textInputType: TextInputType.number,
                 showLabel: false,
                 height: SizeConstant.getHeightWithScreen(50),
@@ -82,8 +123,12 @@ class _CreateJobState extends State<CreateJob> {
                   setState(() {});
                 },
               ),
-              SizedBox(height: SizeConstant.getHeightWithScreen(10)),
-              GestureDetector(
+            ),
+            SizedBox(height: SizeConstant.getHeightWithScreen(10)),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                  horizontal: SizeConstant.horizontalPadding),
+              child: GestureDetector(
                 onTap: () async {
                   await selectDate(_ownerController.dateController, (value) {});
                   setState(() {});
@@ -124,8 +169,12 @@ class _CreateJobState extends State<CreateJob> {
                   ),
                 ),
               ),
-              SizedBox(height: SizeConstant.getHeightWithScreen(10)),
-              CommonTextInputField(
+            ),
+            SizedBox(height: SizeConstant.getHeightWithScreen(10)),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                  horizontal: SizeConstant.horizontalPadding),
+              child: CommonTextInputField(
                 textInputType: TextInputType.text,
                 showLabel: false,
                 height: SizeConstant.getHeightWithScreen(50),
@@ -137,8 +186,12 @@ class _CreateJobState extends State<CreateJob> {
                   setState(() {});
                 },
               ),
-              SizedBox(height: SizeConstant.getHeightWithScreen(10)),
-              CommonTextInputField(
+            ),
+            SizedBox(height: SizeConstant.getHeightWithScreen(10)),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                  horizontal: SizeConstant.horizontalPadding),
+              child: CommonTextInputField(
                 textInputType: TextInputType.text,
                 showLabel: false,
                 isDisabled: true,
@@ -151,12 +204,19 @@ class _CreateJobState extends State<CreateJob> {
                   setState(() {});
                 },
               ),
-              SizedBox(height: SizeConstant.getHeightWithScreen(20)),
-              CommonButton(
+            ),
+            SizedBox(height: SizeConstant.getHeightWithScreen(20)),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                  horizontal: SizeConstant.horizontalPadding),
+              child: CommonButton(
                   bgColor: ColorConstant.outletButtonColor,
                   btnHeight: SizeConstant.getHeightWithScreen(48),
                   onTap: () {
-                    if(_ownerController.faltNoController.text.isNotEmpty && _ownerController.dateController.text.isNotEmpty && _ownerController.typeController.text.isNotEmpty && _ownerController.nameController.text.isNotEmpty){}
+                    if (_ownerController.faltNoController.text.isNotEmpty &&
+                        _ownerController.dateController.text.isNotEmpty &&
+                        _ownerController.typeController.text.isNotEmpty &&
+                        _ownerController.nameController.text.isNotEmpty) {}
                     // String pattern =
                     //     r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
                     // RegExp regex = RegExp(pattern);
@@ -165,8 +225,8 @@ class _CreateJobState extends State<CreateJob> {
                     // }
                   },
                   label: Strings.submit),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
