@@ -1,11 +1,15 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:justconnect/constants/color_constants.dart';
 import 'package:justconnect/constants/size_constants.dart';
 import 'package:justconnect/model/Job.dart';
+import 'package:justconnect/model/user_details.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class JobCard extends StatelessWidget {
-  final Job model;
+  final UserDetails model;
   const JobCard({
     super.key,
     required this.model,
@@ -23,6 +27,25 @@ class JobCard extends StatelessWidget {
       nameLetters = middle[0].toUpperCase();
     }
     return nameLetters;
+  }
+
+  bool isBase64(String? imageUrl) {
+    if (imageUrl == null || imageUrl.isEmpty) return false;
+    try {
+      base64Decode(imageUrl); // Try decoding to see if it's base64
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  String dateConvert(String date) {
+    // Parse the timestamp string to DateTime
+    DateTime dateTime = DateTime.parse(date);
+
+    // Format the DateTime to the desired format (yyyy-MM-dd)
+    String formattedDate = DateFormat('yyyy-MM-dd').format(dateTime);
+    return formattedDate;
   }
 
   @override
@@ -54,7 +77,20 @@ class JobCard extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 30.0,
-              backgroundImage: NetworkImage(model.ownerImage),
+              backgroundImage: model.imageUrl == null ||
+                      model.imageUrl.toString().isEmpty
+                  ? null // No background image (we will show the icon instead)
+                  : isBase64(model.imageUrl)
+                      ? MemoryImage(base64Decode(
+                          model.imageUrl.toString())) // If imageUrl is base64
+                      : NetworkImage(
+                          model.imageUrl.toString()), // If imageUrl is a URL
+              child: model.imageUrl == null || model.imageUrl.toString().isEmpty
+                  ? const Icon(Icons.person,
+                      size: 40,
+                      color: Colors
+                          .white) // Show person icon when image is missing
+                  : null, // Don't show icon if there's an image
             ),
             SizedBox(
               width: SizeConstant.getHeightWithScreen(16),
@@ -67,7 +103,7 @@ class JobCard extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        model.date,
+                        dateConvert(model.createdAt.toString()),
                         style: TextStyle(
                           overflow: TextOverflow.ellipsis,
                           fontSize: SizeConstant.xSmallFont,
@@ -90,7 +126,7 @@ class JobCard extends StatelessWidget {
                   height: SizeConstant.getHeightWithScreen(5),
                 ),
                 Text(
-                  model.fullName,
+                  model.name,
                   style: TextStyle(
                     overflow: TextOverflow.ellipsis,
                     fontSize: SizeConstant.mediumFont,

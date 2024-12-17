@@ -1,13 +1,17 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:justconnect/constants/color_constants.dart';
 import 'package:justconnect/constants/size_constants.dart';
 import 'package:justconnect/constants/strings.dart';
 import 'package:justconnect/model/Job.dart';
+import 'package:justconnect/model/user_details.dart';
 import 'package:justconnect/widget/ventas_primary_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class JobDetailPage extends StatelessWidget {
-  final Job job;
+  final UserDetails job;
 
   const JobDetailPage({Key? key, required this.job}) : super(key: key);
 
@@ -27,6 +31,25 @@ class JobDetailPage extends StatelessWidget {
     } else {
       throw 'Could not make the phone call';
     }
+  }
+
+  bool isBase64(String? imageUrl) {
+    if (imageUrl == null || imageUrl.isEmpty) return false;
+    try {
+      base64Decode(imageUrl); // Try decoding to see if it's base64
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  String dateConvert(String date) {
+    // Parse the timestamp string to DateTime
+    DateTime dateTime = DateTime.parse(date);
+
+    // Format the DateTime to the desired format (yyyy-MM-dd)
+    String formattedDate = DateFormat('yyyy-MM-dd').format(dateTime);
+    return formattedDate;
   }
 
   @override
@@ -104,7 +127,7 @@ class JobDetailPage extends StatelessWidget {
                           Row(children: [
                             GestureDetector(
                               onTap: () {
-                                _makePhoneCall(job.contactNumber);
+                                _makePhoneCall(job.phoneNumber.toString());
                               },
                               child: Image(
                                 image:
@@ -118,7 +141,7 @@ class JobDetailPage extends StatelessWidget {
                             ),
                             GestureDetector(
                               onTap: () {
-                                _launchWhatsApp(job.contactNumber);
+                                _launchWhatsApp(job.phoneNumber.toString());
                               },
                               child: Image(
                                 image: const AssetImage(
@@ -136,7 +159,21 @@ class JobDetailPage extends StatelessWidget {
                     Center(
                       child: CircleAvatar(
                         radius: 50.0,
-                        backgroundImage: NetworkImage(job.ownerImage),
+                        backgroundImage: job.imageUrl == null ||
+                                job.imageUrl.toString().isEmpty
+                            ? null // No background image (we will show the icon instead)
+                            : isBase64(job.imageUrl)
+                                ? MemoryImage(base64Decode(job.imageUrl
+                                    .toString())) // If imageUrl is base64
+                                : NetworkImage(job.imageUrl
+                                    .toString()), // If imageUrl is a URL
+                        child: job.imageUrl == null ||
+                                job.imageUrl.toString().isEmpty
+                            ? const Icon(Icons.person,
+                                size: 40,
+                                color: Colors
+                                    .white) // Show person icon when image is missing
+                            : null, // Don't show icon if there's an image
                       ),
                     ),
                     SizedBox(height: SizeConstant.getHeightWithScreen(20)),
@@ -146,7 +183,7 @@ class JobDetailPage extends StatelessWidget {
                           fontSize: 18.0, fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      'Date: ${job.date}',
+                      'Date: ${dateConvert(job.createdAt)}',
                       style: const TextStyle(fontSize: 16.0),
                     ),
                     Text(
@@ -154,7 +191,7 @@ class JobDetailPage extends StatelessWidget {
                       style: const TextStyle(fontSize: 16.0),
                     ),
                     Text(
-                      'Full Name: ${job.fullName}',
+                      'Full Name: ${job.name}',
                       style: const TextStyle(
                           fontSize: 16.0, fontStyle: FontStyle.italic),
                     ),

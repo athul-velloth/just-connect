@@ -97,7 +97,8 @@ class _LoginState extends State<Login> {
                               .from('user') // Replace with your table name
                               .select()
                               .eq('email', email) // Filter by email
-                              .single();
+                              .eq('password', password) // Filter by password
+                              .maybeSingle();
                           // final response = await Supabase.instance.client.auth
                           //     .signInWithPassword(
                           //   email: email,
@@ -107,8 +108,7 @@ class _LoginState extends State<Login> {
                           // Check for successful sign-in
                           if (response != null) {
                             showDownloadSnackbar("Login successful");
-
-                            //   Get.to(() => const Home());
+                            Get.to(() => const Home());
                           } else {
                             showDownloadSnackbar("Login failed: No user found");
                           }
@@ -117,7 +117,7 @@ class _LoginState extends State<Login> {
                           showDownloadSnackbar("Login failed: ${e.message}");
                         } catch (e) {
                           // Handle unexpected errors
-                          showDownloadSnackbar("Unexpected error: $e");
+                          showDownloadSnackbar("invalid Login details");
                         } finally {
                           setState(() {
                             //_loading = false; // Reset loading state

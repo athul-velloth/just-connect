@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
@@ -26,15 +27,48 @@ class _SignUpState extends State<SignUp> {
   String _userType = 'Owner';
   File? _selfieImage; // To store the captured image
   final ImagePicker _picker = ImagePicker();
+  String imageUrl = "";
   Future<void> _takeSelfie() async {
     final XFile? image = await _picker.pickImage(
       source: ImageSource.camera, // Use camera for selfie
       preferredCameraDevice: CameraDevice.front, // Front camera for selfies
     );
     if (image != null) {
-      setState(() {
-        _selfieImage = File(image.path); // Store the image file
+      setState(() async {
+        _selfieImage = File(image.path);
+        try {
+          List<int> imageBytes = await _selfieImage!.readAsBytes();
+          // Convert bytes to Base64 string
+          imageUrl = base64Encode(imageBytes);
+          _uploadImage(_selfieImage); // Store the image file
+        } catch (e) {
+          debugPrint('Error converting image to Base64: $e');
+          return null;
+        }
       });
+    }
+  }
+
+  Future<void> _uploadImage(File? selfieImage) async {
+    // Pick an image from gallery
+    if (selfieImage == null) return;
+
+    try {
+      // Generate a file name with a timestamp
+      final fileName = 'images/${DateTime.now().millisecondsSinceEpoch}.png';
+
+      // Upload the image to Supabase Storage
+      final response = await Supabase.instance.client.storage
+          .from('profileImage') // Replace with your bucket name
+          .upload(fileName, selfieImage);
+      // Get the public URL of the image
+      // imageUrl = Supabase.instance.client.storage
+      //     .from('profileImage')
+      //     .getPublicUrl(fileName);
+      showDownloadSnackbar('Image uploaded successfully: $imageUrl');
+    } catch (e) {
+      print('Error: $e');
+      showDownloadSnackbar('Error uploading image: $e');
     }
   }
 
@@ -318,6 +352,8 @@ class _SignUpState extends State<SignUp> {
                         _loginController.confirmPasswordController.text
                             .trim()) {
                       showDownloadSnackbar("Password did not match");
+                    } else if (imageUrl.isEmpty) {
+                      showDownloadSnackbar("Please take selfie");
                     } else {
                       try {
                         // Sign in with Supabase
@@ -334,6 +370,8 @@ class _SignUpState extends State<SignUp> {
                           'job_type':
                               _loginController.typeController.text.trim(),
                           'sign_up_type': _userType.trim(),
+                          'image_url': imageUrl,
+                          'uploaded_at': DateTime.now().toIso8601String()
                         }).select();
                         // final response = await Supabase.instance.client.auth
                         //     .signUp(
@@ -351,6 +389,7 @@ class _SignUpState extends State<SignUp> {
                         _loginController.passwordController.clear();
                         _loginController.confirmPasswordController.clear();
                         _loginController.typeController.clear();
+                        Get.off(() => const Login());
                         //   Get.to(() => const Home());
                         // } else {
                         //   showDownloadSnackbar("Login failed: No user found");
