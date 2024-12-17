@@ -6,6 +6,7 @@ import 'package:justconnect/Ui/owner_dashboard/owner_dashboard.dart';
 import 'package:justconnect/Ui/signup.dart';
 import 'package:justconnect/constants/color_constants.dart';
 import 'package:justconnect/constants/size_constants.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../widget/commontextInputfield.dart';
 import '../widget/common_button.dart';
@@ -22,21 +23,116 @@ class _LoginState extends State<Login> {
   final TextEditingController passwordController = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        backgroundColor: ColorConstant.white,
-        body: Container(
-          margin: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _header(context),
-              _inputField(context),
-              SizedBox(),
-              _signup(context),
-            ],
-          ),
+    return Scaffold(
+      backgroundColor: ColorConstant.white,
+      body: Container(
+        margin: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _header(context),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                TextField(
+                  controller: emailController,
+                  decoration: InputDecoration(
+                      hintText: "Email",
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(18),
+                          borderSide: BorderSide.none),
+                      fillColor: Colors.purple.withOpacity(0.1),
+                      filled: true,
+                      prefixIcon: const Icon(Icons.person)),
+                ),
+                SizedBox(height: SizeConstant.getHeightWithScreen(10)),
+                TextField(
+                  controller: passwordController,
+                  decoration: InputDecoration(
+                    hintText: "Password",
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(18),
+                        borderSide: BorderSide.none),
+                    fillColor: Colors.purple.withOpacity(0.1),
+                    filled: true,
+                    prefixIcon: const Icon(Icons.password),
+                  ),
+                  obscureText: true,
+                ),
+                SizedBox(height: SizeConstant.getHeightWithScreen(40)),
+                CommonButton(
+                    bgColor: ColorConstant.outletButtonColor,
+                    btnHeight: SizeConstant.getHeightWithScreen(55),
+                    borderRadius: SizeConstant.getHeightWithScreen(20.0),
+                    onTap: () async {
+                      String pattern =
+                          r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
+                      RegExp regex = RegExp(pattern);
+
+                      final username = emailController.text;
+                      final password = passwordController.text;
+                      if (username.isEmpty || password.isEmpty) {
+                        // Show error if fields are empty
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content:
+                                  Text('Please enter both email and password')),
+                        );
+                      } else if (!regex.hasMatch(emailController.text.trim())) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Please enter valid email')),
+                        );
+                      } else {
+                        setState(() {
+                          // _loading = true;
+                        });
+
+                        try {
+                          final email = emailController.text.trim();
+                          final password = passwordController.text.trim();
+
+                          // Sign in with Supabase
+                          final response = await Supabase.instance.client
+                              .from('user') // Replace with your table name
+                              .select()
+                              .eq('email', email) // Filter by email
+                              .single();
+                          // final response = await Supabase.instance.client.auth
+                          //     .signInWithPassword(
+                          //   email: email,
+                          //   password: password ,
+                          // );
+
+                          // Check for successful sign-in
+                          if (response != null) {
+                            showDownloadSnackbar("Login successful");
+
+                            //   Get.to(() => const Home());
+                          } else {
+                            showDownloadSnackbar("Login failed: No user found");
+                          }
+                        } on AuthException catch (e) {
+                          // Handle Supabase-specific authentication errors
+                          showDownloadSnackbar("Login failed: ${e.message}");
+                        } catch (e) {
+                          // Handle unexpected errors
+                          showDownloadSnackbar("Unexpected error: $e");
+                        } finally {
+                          setState(() {
+                            //_loading = false; // Reset loading state
+                          });
+                        }
+
+                        //  Get.to(() => const Home());
+                      }
+                    },
+                    label: 'Login'),
+              ],
+            ),
+            SizedBox(),
+            _signup(context),
+          ],
         ),
       ),
     );
@@ -54,63 +150,19 @@ class _LoginState extends State<Login> {
     );
   }
 
-  _inputField(context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        TextField(
-          decoration: InputDecoration(
-              hintText: "Email",
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(18),
-                  borderSide: BorderSide.none),
-              fillColor: Colors.purple.withOpacity(0.1),
-              filled: true,
-              prefixIcon: const Icon(Icons.person)),
-        ),
-        SizedBox(height: SizeConstant.getHeightWithScreen(10)),
-        TextField(
-          decoration: InputDecoration(
-            hintText: "Password",
-            border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(18),
-                borderSide: BorderSide.none),
-            fillColor: Colors.purple.withOpacity(0.1),
-            filled: true,
-            prefixIcon: const Icon(Icons.password),
+  Future<void> showDownloadSnackbar(String message) async {
+    Future.delayed(const Duration(milliseconds: 100), () {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            message,
           ),
-          obscureText: true,
+          backgroundColor: Colors.black,
+          duration: const Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
         ),
-        SizedBox(height: SizeConstant.getHeightWithScreen(40)),
-        CommonButton(
-            bgColor: ColorConstant.outletButtonColor,
-            btnHeight: SizeConstant.getHeightWithScreen(55),
-            borderRadius: SizeConstant.getHeightWithScreen(20.0),
-            onTap: () {
-              String pattern =
-                  r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
-              RegExp regex = RegExp(pattern);
-
-              final username = emailController.text;
-              final password = passwordController.text;
-              Get.to(() => const Home());
-              if (username.isEmpty || password.isEmpty) {
-                // Show error if fields are empty
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                      content: Text('Please enter both email and password')),
-                );
-              } else if (!regex.hasMatch(emailController.text.trim())) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Please enter valid email')),
-                );
-              } else {
-                Get.to(() => const Home());
-              }
-            },
-            label: 'Login'),
-      ],
-    );
+      );
+    });
   }
 
   _forgotPassword(context) {

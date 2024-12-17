@@ -6,7 +6,9 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:justconnect/Ui/login.dart';
+import 'package:justconnect/controller/login_controller.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../constants/color_constants.dart';
 import '../constants/size_constants.dart';
 import '../widget/commontextInputfield.dart';
@@ -20,12 +22,7 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final TextEditingController faltNoController = TextEditingController();
-  final TextEditingController mobileNoController = TextEditingController();
-  final TextEditingController typeController = TextEditingController();
+  final LoginController _loginController = Get.put(LoginController());
   String _userType = 'Owner';
   File? _selfieImage; // To store the captured image
   final ImagePicker _picker = ImagePicker();
@@ -62,6 +59,21 @@ class _SignUpState extends State<SignUp> {
             content: Text("Camera permission is required to take selfies.")),
       );
     }
+  }
+
+  Future<void> showDownloadSnackbar(String message) async {
+    Future.delayed(const Duration(milliseconds: 100), () {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            message,
+          ),
+          backgroundColor: Colors.black,
+          duration: const Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    });
   }
 
   @override
@@ -135,6 +147,7 @@ class _SignUpState extends State<SignUp> {
                       onPressed: () {
                         setState(() {
                           _userType = 'Owner';
+                          _loginController.typeController.clear();
                         });
                       },
                       style: ElevatedButton.styleFrom(
@@ -173,7 +186,7 @@ class _SignUpState extends State<SignUp> {
               Column(
                 children: <Widget>[
                   TextField(
-                    controller: nameController,
+                    controller: _loginController.nameController,
                     decoration: InputDecoration(
                         hintText: "Enter Name",
                         border: OutlineInputBorder(
@@ -185,7 +198,7 @@ class _SignUpState extends State<SignUp> {
                   ),
                   SizedBox(height: SizeConstant.getHeightWithScreen(10)),
                   TextField(
-                    controller: emailController,
+                    controller: _loginController.emailController,
                     decoration: InputDecoration(
                         hintText: "Enter Email",
                         border: OutlineInputBorder(
@@ -197,7 +210,7 @@ class _SignUpState extends State<SignUp> {
                   ),
                   SizedBox(height: SizeConstant.getHeightWithScreen(10)),
                   TextField(
-                    controller: mobileNoController,
+                    controller: _loginController.mobileNoController,
                     decoration: InputDecoration(
                         hintText: "Enter Mobile No.",
                         border: OutlineInputBorder(
@@ -209,7 +222,7 @@ class _SignUpState extends State<SignUp> {
                   ),
                   SizedBox(height: SizeConstant.getHeightWithScreen(10)),
                   TextField(
-                    controller: faltNoController,
+                    controller: _loginController.faltNoController,
                     decoration: InputDecoration(
                         hintText: "Enter Flat No.",
                         border: OutlineInputBorder(
@@ -225,7 +238,7 @@ class _SignUpState extends State<SignUp> {
                   _userType == "Owner"
                       ? const SizedBox()
                       : TextField(
-                          controller: typeController,
+                          controller: _loginController.typeController,
                           decoration: InputDecoration(
                               hintText: "Enter Type of Job.",
                               border: OutlineInputBorder(
@@ -237,6 +250,7 @@ class _SignUpState extends State<SignUp> {
                         ),
                   SizedBox(height: SizeConstant.getHeightWithScreen(10)),
                   TextField(
+                    controller: _loginController.passwordController,
                     decoration: InputDecoration(
                       hintText: "Password",
                       border: OutlineInputBorder(
@@ -250,6 +264,7 @@ class _SignUpState extends State<SignUp> {
                   ),
                   SizedBox(height: SizeConstant.getHeightWithScreen(10)),
                   TextField(
+                    controller: _loginController.confirmPasswordController,
                     decoration: InputDecoration(
                       hintText: "Confirm Password",
                       border: OutlineInputBorder(
@@ -268,11 +283,93 @@ class _SignUpState extends State<SignUp> {
                   bgColor: ColorConstant.outletButtonColor,
                   btnHeight: SizeConstant.getHeightWithScreen(55),
                   borderRadius: SizeConstant.getHeightWithScreen(20),
-                  onTap: () {
+                  onTap: () async {
+                    final email = _loginController.emailController.text.trim();
+                    final password =
+                        _loginController.passwordController.text.trim();
                     String pattern =
                         r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
                     RegExp regex = RegExp(pattern);
-                    if (!regex.hasMatch(emailController.text.trim())) {}
+                    if (_loginController.nameController.text.isEmpty ||
+                        _loginController.nameController.text.length < 3) {
+                      // Show error if fields are empty
+                      showDownloadSnackbar("Please enter the name");
+                    } else if (!regex.hasMatch(
+                        _loginController.emailController.text.trim())) {
+                      showDownloadSnackbar("Please enter the valid email");
+                    } else if (_loginController.mobileNoController.text
+                            .trim()
+                            .length <
+                        9) {
+                      showDownloadSnackbar("Please enter the valid number");
+                    } else if (_loginController.faltNoController.text
+                        .trim()
+                        .isEmpty) {
+                      showDownloadSnackbar("Please enter the flat no");
+                    } else if (_userType == "Maid" &&
+                        _loginController.typeController.text.trim().isEmpty) {
+                      showDownloadSnackbar("Please enter the job type");
+                    } else if (_loginController.passwordController.text
+                        .trim()
+                        .isEmpty) {
+                      showDownloadSnackbar("Please enter the password");
+                    } else if (_loginController.passwordController.text
+                            .trim() !=
+                        _loginController.confirmPasswordController.text
+                            .trim()) {
+                      showDownloadSnackbar("Password did not match");
+                    } else {
+                      try {
+                        // Sign in with Supabase
+                        final response = await Supabase.instance.client
+                            .from('user') // Your table name
+                            .insert({
+                          'email': email,
+                          'password': password,
+                          'name': _loginController.nameController.text.trim(),
+                          'phone_number':
+                              _loginController.mobileNoController.text.trim(),
+                          'flat_no':
+                              _loginController.faltNoController.text.trim(),
+                          'job_type':
+                              _loginController.typeController.text.trim(),
+                          'sign_up_type': _userType.trim(),
+                        }).select();
+                        // final response = await Supabase.instance.client.auth
+                        //     .signUp(
+                        //   email: email,
+                        //   password: password,
+                        // );
+
+                        // Check for successful sign-in
+                        // if (response.user != null) {
+                        showDownloadSnackbar("SignUP successful");
+                        _loginController.nameController.clear();
+                        _loginController.emailController.clear();
+                        _loginController.mobileNoController.clear();
+                        _loginController.faltNoController.clear();
+                        _loginController.passwordController.clear();
+                        _loginController.confirmPasswordController.clear();
+                        _loginController.typeController.clear();
+                        //   Get.to(() => const Home());
+                        // } else {
+                        //   showDownloadSnackbar("Login failed: No user found");
+                        // }
+                      } on AuthException catch (e) {
+                        // Handle Supabase-specific authentication errors
+                        showDownloadSnackbar("Login failed: ${e.message}");
+                      } catch (e) {
+                        // Handle unexpected errors
+                        showDownloadSnackbar("Unexpected error: $e");
+                        print("$e");
+                      } finally {
+                        setState(() {
+                          //_loading = false; // Reset loading state
+                        });
+                      }
+
+                      //  Get.to(() => const Home());
+                    }
                   },
                   label: 'Sign Up'),
               SizedBox(height: SizeConstant.getHeightWithScreen(10)),
