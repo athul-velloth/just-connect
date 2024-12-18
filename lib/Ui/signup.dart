@@ -177,33 +177,33 @@ class _SignUpState extends State<SignUp> {
                 ],
               ),
               SizedBox(height: SizeConstant.getHeightWithScreen(20)),
-              CircleAvatar(
-                radius: 50, // Size of the avatar
-                backgroundImage: _selfieImage != null
-                    ? FileImage(_selfieImage!) // Display captured selfie
-                    : null,
-                child: _selfieImage == null
-                    ? const Icon(
-                        Icons.camera_alt,
-                        size: 40,
-                        color: Colors.grey,
-                      )
-                    : null, // Show a camera icon if no selfie is taken
-              ),
-              SizedBox(height: SizeConstant.getHeightWithScreen(5)),
               GestureDetector(
                 onTap: () {
                   _requestCameraPermission();
                 },
-                child: Center(
-                  child: Text(
-                    'Take Selfie',
-                    style: TextStyle(
-                      overflow: TextOverflow.ellipsis,
-                      fontSize: SizeConstant.largeFont,
-                      fontWeight: FontWeight.w500,
-                      color: ColorConstant.black,
-                    ),
+                child: CircleAvatar(
+                  radius: 50, // Size of the avatar
+                  backgroundImage: _selfieImage != null
+                      ? FileImage(_selfieImage!) // Display captured selfie
+                      : null,
+                  child: _selfieImage == null
+                      ? const Icon(
+                          Icons.camera_alt,
+                          size: 40,
+                          color: Colors.grey,
+                        )
+                      : null, // Show a camera icon if no selfie is taken
+                ),
+              ),
+              SizedBox(height: SizeConstant.getHeightWithScreen(5)),
+              Center(
+                child: Text(
+                  'Take Selfie',
+                  style: TextStyle(
+                    overflow: TextOverflow.ellipsis,
+                    fontSize: SizeConstant.largeFont,
+                    fontWeight: FontWeight.w500,
+                    color: ColorConstant.black,
                   ),
                 ),
               ),

@@ -191,6 +191,11 @@ class _UserProfileState extends State<UserProfile> {
                       style: const TextStyle(
                           fontSize: 16.0, fontStyle: FontStyle.italic),
                     ),
+                    Text(
+                      'Mobile Number: ${phoneNumber}',
+                      style: const TextStyle(
+                          fontSize: 16.0, fontStyle: FontStyle.italic),
+                    ),
                   ],
                 ),
               ),
