@@ -11,6 +11,7 @@ import 'package:justconnect/Ui/worker_dashboard/user_list.dart';
 import 'package:justconnect/constants/strings.dart';
 import 'package:justconnect/controller/worker_controller.dart';
 import 'package:justconnect/model/job_details_model.dart';
+import 'package:justconnect/model/job_list.dart';
 import 'package:justconnect/model/user_details.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -27,26 +28,61 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final WorkerController _ownerController = Get.put(WorkerController());
   List<JobDetailsModel> userList = [];
+  List<String> resultId = [];
+  String jobResult = "";
+  List<JobList> jobList = [];
   @override
   void initState() {
     fetchAllUsers();
+    fetchAllJob();
     super.initState();
   }
 
   Future<void> fetchAllUsers() async {
     try {
-      final response = await Supabase.instance.client
-          .from('job_create_list') // Replace 'users' with your table name
-          .select()
-          .eq('job_status', 'Active'); // Fetch all rows
+      // final response = await Supabase.instance.client
+      //     .from('job_create_list') // Replace 'users' with your table name
+      //     .select()
+      //     .eq('job_status', 'Active'); // Fetch all rows
 // Fetch all rows
-
+      dynamic response = "";
+      if (jobResult.isNotEmpty) {
+        response = await Supabase.instance.client
+            .from('job_create_list') // Replace 'users' with your table name
+            .select()
+            .eq('job_status', 'Active')
+            .filter('job_type', 'eq', jsonEncode(resultId));
+      } else {
+        response = await Supabase.instance.client
+            .from('job_create_list') // Replace 'users' with your table name
+            .select()
+            .eq('job_status', 'Active');
+      }
+      // Fe
       if (response.isNotEmpty) {
         print('User List: $response');
         setState(() {
           userList = (response as List)
               .map((data) => JobDetailsModel.fromJson(data))
               .toList();
+        });
+      } else {
+        print('No users found.');
+      }
+    } catch (e) {
+      print('Error fetching user list: $e');
+    }
+  }
+
+  Future<void> fetchAllJob() async {
+    try {
+      final response =
+          await Supabase.instance.client.from('job_type_list').select();
+      if (response.isNotEmpty) {
+        print('User List: $response');
+        setState(() {
+          jobList =
+              (response as List).map((data) => JobList.fromJson(data)).toList();
         });
       } else {
         print('No users found.');
@@ -75,199 +111,256 @@ class _HomeState extends State<Home> {
     return formattedDate;
   }
 
+  String jobTypeConvert(String job) {
+    List<String> jobTypes = List<String>.from(jsonDecode(job));
+    String jobTypesString = jobTypes.join(', ');
+    return jobTypesString;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Scaffold(
-        backgroundColor: ColorConstant.white,
-        body: Padding(
-          padding: EdgeInsets.only(
-              left: SizeConstant.getHeightWithScreen(15),
-              right: SizeConstant.getHeightWithScreen(15)),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(
-                height: MediaQuery.of(context).viewPadding.top,
-              ),
-              // Wrap ListView.builder with Flexible or Expanded
-              Padding(
-                padding: EdgeInsets.only(
-                    left: SizeConstant.horizontalPadding,
-                    top: SizeConstant.topPadding,
-                    right: SizeConstant.horizontalPadding),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      Strings.workerDashboard,
-                      style: TextStyle(
-                        color: ColorConstant.black.withOpacity(0.88),
-                        fontSize: SizeConstant.largeFont,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Get.to(() => const UserList());
-                      },
-                      child: Icon(
-                        Icons.exit_to_app,
-                        size: SizeConstant.getHeightWithScreen(26),
-                        color: ColorConstant.black.withOpacity(0.88),
-                      ),
-                    ),
-                  ],
+    return PopScope(
+      canPop: false,
+      child: SafeArea(
+        top: false,
+        child: Scaffold(
+          backgroundColor: ColorConstant.white,
+          body: Padding(
+            padding: EdgeInsets.only(
+                left: SizeConstant.getHeightWithScreen(15),
+                right: SizeConstant.getHeightWithScreen(15)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).viewPadding.top,
                 ),
-              ),
-              userList.isNotEmpty
-                  ? Expanded(
-                      child: ListView.builder(
-                        itemCount: userList.length,
-                        itemBuilder: (context, index) {
-                          final job = userList[index];
-                          return GestureDetector(
+                // Wrap ListView.builder with Flexible or Expanded
+                Padding(
+                  padding: EdgeInsets.only(
+                      left: SizeConstant.horizontalPadding,
+                      top: SizeConstant.topPadding,
+                      right: SizeConstant.horizontalPadding),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        Strings.workerDashboard,
+                        style: TextStyle(
+                          color: ColorConstant.black.withOpacity(0.88),
+                          fontSize: SizeConstant.largeFont,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          GestureDetector(
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => JobDetailPage(job: job),
-                                ),
-                              );
+                              _showModal(jobList);
                             },
-                            child: Container(
-                              margin: EdgeInsets.only(
-                                top: SizeConstant.getHeightWithScreen(10),
-                                bottom: SizeConstant.getHeightWithScreen(12),
-                              ),
-                              padding: EdgeInsets.only(
-                                left: SizeConstant.getHeightWithScreen(10),
-                                right: SizeConstant.getHeightWithScreen(12),
-                                top: SizeConstant.getHeightWithScreen(10),
-                                bottom: SizeConstant.getHeightWithScreen(12),
-                              ),
-                              decoration: BoxDecoration(
-                                color: ColorConstant.white,
-                                border: Border.all(
-                                    color: ColorConstant.grey8, width: 2),
-                                borderRadius: BorderRadius.all(Radius.circular(
-                                    SizeConstant.getHeightWithScreen(15))),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: ColorConstant.shadowColor,
-                                    blurRadius: 6,
-                                    blurStyle:
-                                        BlurStyle.outer, //extend the shadow
-                                  )
-                                ],
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  CircleAvatar(
-                                    radius: 30.0,
-                                    backgroundImage: job.ownerProfileImage ==
-                                                null ||
-                                            job.ownerProfileImage
-                                                .toString()
-                                                .isEmpty
-                                        ? null // No background image (we will show the icon instead)
-                                        : isBase64(job.ownerProfileImage)
-                                            ? MemoryImage(base64Decode(job
-                                                .ownerProfileImage
-                                                .toString())) // If imageUrl is base64
-                                            : NetworkImage(job.ownerProfileImage
-                                                .toString()), // If imageUrl is a URL
-                                    child: job.ownerProfileImage == null ||
-                                            job.ownerProfileImage
-                                                .toString()
-                                                .isEmpty
-                                        ? const Icon(Icons.person,
-                                            size: 40,
-                                            color: Colors
-                                                .white) // Show person icon when image is missing
-                                        : null, // Don't show icon if there's an image
+                            child: Icon(
+                              Icons.filter_1_outlined,
+                              size: SizeConstant.getHeightWithScreen(26),
+                              color: ColorConstant.black.withOpacity(0.88),
+                            ),
+                          ),
+                          SizedBox(
+                            width: SizeConstant.getHeightWithScreen(10),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Get.to(() => const UserList());
+                            },
+                            child: Icon(
+                              Icons.exit_to_app,
+                              size: SizeConstant.getHeightWithScreen(26),
+                              color: ColorConstant.black.withOpacity(0.88),
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+                userList.isNotEmpty
+                    ? Expanded(
+                        child: ListView.builder(
+                          itemCount: userList.length,
+                          itemBuilder: (context, index) {
+                            final job = userList[index];
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        JobDetailPage(job: job),
                                   ),
-                                  SizedBox(
-                                    width: SizeConstant.getHeightWithScreen(16),
-                                  ),
-                                  Expanded(
-                                      child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              job.date.toString(),
-                                              style: TextStyle(
-                                                overflow: TextOverflow.ellipsis,
-                                                fontSize:
-                                                    SizeConstant.xSmallFont,
-                                                fontWeight: FontWeight.w500,
-                                                color: ColorConstant.grey26,
+                                );
+                              },
+                              child: Container(
+                                margin: EdgeInsets.only(
+                                  top: SizeConstant.getHeightWithScreen(10),
+                                  bottom: SizeConstant.getHeightWithScreen(12),
+                                ),
+                                padding: EdgeInsets.only(
+                                  left: SizeConstant.getHeightWithScreen(10),
+                                  right: SizeConstant.getHeightWithScreen(12),
+                                  top: SizeConstant.getHeightWithScreen(10),
+                                  bottom: SizeConstant.getHeightWithScreen(12),
+                                ),
+                                decoration: BoxDecoration(
+                                  color: ColorConstant.white,
+                                  border: Border.all(
+                                      color: ColorConstant.grey8, width: 2),
+                                  borderRadius: BorderRadius.all(
+                                      Radius.circular(
+                                          SizeConstant.getHeightWithScreen(
+                                              15))),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: ColorConstant.shadowColor,
+                                      blurRadius: 6,
+                                      blurStyle:
+                                          BlurStyle.outer, //extend the shadow
+                                    )
+                                  ],
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 30.0,
+                                      backgroundImage: job.ownerProfileImage ==
+                                                  null ||
+                                              job.ownerProfileImage
+                                                  .toString()
+                                                  .isEmpty
+                                          ? null // No background image (we will show the icon instead)
+                                          : isBase64(job.ownerProfileImage)
+                                              ? MemoryImage(base64Decode(job
+                                                  .ownerProfileImage
+                                                  .toString())) // If imageUrl is base64
+                                              : NetworkImage(job
+                                                  .ownerProfileImage
+                                                  .toString()), // If imageUrl is a URL
+                                      child: job.ownerProfileImage == null ||
+                                              job.ownerProfileImage
+                                                  .toString()
+                                                  .isEmpty
+                                          ? const Icon(Icons.person,
+                                              size: 40,
+                                              color: Colors
+                                                  .white) // Show person icon when image is missing
+                                          : null, // Don't show icon if there's an image
+                                    ),
+                                    SizedBox(
+                                      width:
+                                          SizeConstant.getHeightWithScreen(16),
+                                    ),
+                                    Expanded(
+                                        child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Text(
+                                                job.date.toString(),
+                                                style: TextStyle(
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  fontSize:
+                                                      SizeConstant.xSmallFont,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: ColorConstant.grey26,
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                          SizedBox(
-                                            width: SizeConstant
-                                                .getHeightWithScreen(5),
-                                          ),
-                                          Icon(
-                                            Icons.arrow_forward_ios,
-                                            color: ColorConstant.primaryColor,
-                                            size: SizeConstant
-                                                .getHeightWithScreen(12),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        height:
-                                            SizeConstant.getHeightWithScreen(5),
-                                      ),
-                                      Text(
-                                        job.ownerName,
-                                        style: TextStyle(
-                                          overflow: TextOverflow.ellipsis,
-                                          fontSize: SizeConstant.mediumFont,
-                                          fontWeight: FontWeight.w600,
-                                          color: ColorConstant.black3,
+                                            SizedBox(
+                                              width: SizeConstant
+                                                  .getHeightWithScreen(5),
+                                            ),
+                                            Icon(
+                                              Icons.arrow_forward_ios,
+                                              color: ColorConstant.primaryColor,
+                                              size: SizeConstant
+                                                  .getHeightWithScreen(12),
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                      SizedBox(
-                                        height:
-                                            SizeConstant.getHeightWithScreen(4),
-                                      ),
-                                      Text(
-                                        job.jobType,
-                                        style: TextStyle(
-                                          overflow: TextOverflow.visible,
-                                          fontSize: SizeConstant.xSmallFont,
-                                          fontWeight: FontWeight.w500,
-                                          color: ColorConstant.grey26,
+                                        SizedBox(
+                                          height:
+                                              SizeConstant.getHeightWithScreen(
+                                                  5),
                                         ),
-                                      ),
-                                    ],
-                                  ))
-                                ],
+                                        Text(
+                                          job.ownerName,
+                                          style: TextStyle(
+                                            overflow: TextOverflow.ellipsis,
+                                            fontSize: SizeConstant.mediumFont,
+                                            fontWeight: FontWeight.w600,
+                                            color: ColorConstant.black3,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height:
+                                              SizeConstant.getHeightWithScreen(
+                                                  4),
+                                        ),
+                                        Text(
+                                          jobTypeConvert(job.jobType),
+                                          style: TextStyle(
+                                            overflow: TextOverflow.visible,
+                                            fontSize: SizeConstant.xSmallFont,
+                                            fontWeight: FontWeight.w500,
+                                            color: ColorConstant.grey26,
+                                          ),
+                                        ),
+                                      ],
+                                    ))
+                                  ],
+                                ),
                               ),
-                            ),
-                          );
-                        },
+                            );
+                          },
+                        ),
+                      )
+                    : const Expanded(
+                        child: Center(
+                          child: Text("No data Found"),
+                        ),
                       ),
-                    )
-                  : const Expanded(
-                      child: Center(
-                        child: Text("No data Found"),
-                      ),
-                    ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  _showModal(List<JobList> jobList) async {
+    final result = await showModalBottomSheet<List<String>>(
+        context: context,
+        isScrollControlled: true,
+        isDismissible: false,
+        builder: (context) =>
+            JobFilterSelectionModal(jobList: jobList, resultId: resultId));
+    if (result != null) {
+      if (result.isEmpty) {
+        setState(() {
+          fetchAllUsers();
+          jobResult = "";
+          resultId = [];
+        });
+      }
+      setState(() {
+        jobResult = result.toString();
+        resultId = result;
+        fetchAllUsers();
+      });
+    }
   }
 }

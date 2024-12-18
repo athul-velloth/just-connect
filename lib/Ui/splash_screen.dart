@@ -28,18 +28,24 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   void initState() {
-     WidgetsBinding.instance.addPostFrameCallback((_) {
-        setState(() {
-          signUpType = storage.read('SignUpType');
-        });
-      });
+    initApiCall();
     super.initState();
   }
 
-  @override
-  Widget build(BuildContext context) {
+  initApiCall() async {
+    final storage = GetStorage();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final storedValue = storage.read('SignUpType');
+      print('SignUpType from storage: $storedValue'); // Debug
+      setState(() {
+        signUpType = storedValue ?? '';
+      });
+    });
+    await checkUser();
+  }
+
+  Future<void> checkUser() async {
     Future.delayed(const Duration(seconds: 3), () {
-     
       if (signUpType.isEmpty || signUpType == null) {
         Get.to(() => const Login());
       } else {
@@ -50,6 +56,10 @@ class _SplashScreenState extends State<SplashScreen> {
         }
       }
     });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     ScreenUtil.init(
       context,
       designSize: const Size(375, 812), // Set your design size.

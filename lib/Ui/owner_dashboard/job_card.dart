@@ -49,6 +49,12 @@ class JobCard extends StatelessWidget {
     return formattedDate;
   }
 
+  String jobTypeConvert(String job) {
+    List<String> jobTypes = List<String>.from(jsonDecode(job));
+    String jobTypesString = jobTypes.join(', ');
+    return jobTypesString;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(children: [
@@ -144,7 +150,7 @@ class JobCard extends StatelessWidget {
                   height: SizeConstant.getHeightWithScreen(4),
                 ),
                 Text(
-                  model.jobType,
+                  jobTypeConvert(model.jobType),
                   style: TextStyle(
                     overflow: TextOverflow.visible,
                     fontSize: SizeConstant.xSmallFont,

@@ -29,7 +29,7 @@ class _SignUpState extends State<SignUp> {
   File? _selfieImage; // To store the captured image
   final ImagePicker _picker = ImagePicker();
   String imageUrl = "";
-  String resultId = "";
+  List<String> resultId = [];
   String jobResult = "";
   List<JobList> jobList = [];
 
@@ -212,7 +212,7 @@ class _SignUpState extends State<SignUp> {
                         setState(() {
                           _userType = 'Owner';
                           _loginController.typeController.clear();
-                          resultId = "";
+                          resultId = [];
                           jobResult = "";
                         });
                       },
@@ -371,8 +371,6 @@ class _SignUpState extends State<SignUp> {
                             ),
                           ],
                         ),
-                
-                
                   SizedBox(height: SizeConstant.getHeightWithScreen(10)),
                   TextField(
                     controller: _loginController.passwordController,
@@ -458,7 +456,7 @@ class _SignUpState extends State<SignUp> {
                               _loginController.mobileNoController.text.trim(),
                           'flat_no':
                               _loginController.faltNoController.text.trim(),
-                          'job_type': jobResult,
+                          'job_type': jsonEncode(resultId),
                           'sign_up_type': _userType.trim(),
                           'image_url': imageUrl,
                           'uploaded_at': DateTime.now().toIso8601String()
@@ -480,7 +478,7 @@ class _SignUpState extends State<SignUp> {
                         _loginController.confirmPasswordController.clear();
                         _loginController.typeController.clear();
                         jobResult = "";
-                        resultId = "";
+                        resultId = [];
                         Get.off(() => const Login());
                         //   Get.to(() => const Home());
                         // } else {
@@ -526,17 +524,16 @@ class _SignUpState extends State<SignUp> {
   }
 
   _showModal(List<JobList> jobList) async {
-    final result = await showModalBottomSheet<String>(
+    final result = await showModalBottomSheet<List<String>>(
         context: context,
         isScrollControlled: true,
         isDismissible: false,
         builder: (context) =>
             JobSelectionModal(jobList: jobList, resultId: resultId));
     if (result != null) {
-      int index = int.parse(result);
       setState(() {
-        jobResult = jobList[index].jobName ?? "";
-        resultId = jobList[index].id.toString() ?? "";
+        jobResult = result.toString();
+        resultId = result;
       });
     }
   }
@@ -544,7 +541,7 @@ class _SignUpState extends State<SignUp> {
 
 class JobSelectionModal extends StatefulWidget {
   final List<JobList> jobList;
-  final String resultId;
+  final List<String> resultId;
 
   const JobSelectionModal(
       {super.key, required this.jobList, required this.resultId});
@@ -556,9 +553,10 @@ class JobSelectionModal extends StatefulWidget {
 class _JobSelectionModalState extends State<JobSelectionModal> {
   String selectedRadioValue = 'any'.tr;
   String selectedNumber = "";
+  List<String> selectedItems = [];
   @override
   void initState() {
-    selectedRadioValue = widget.resultId;
+    selectedItems = widget.resultId;
     super.initState();
   }
 
@@ -566,18 +564,18 @@ class _JobSelectionModalState extends State<JobSelectionModal> {
   Widget build(BuildContext context) {
     return Stack(children: [
       SingleChildScrollView(
-          child: Container(
-        padding: EdgeInsets.only(top: SizeConstant.getHeightWithScreen(50)),
-        color: const Color(0xff757575),
         child: Container(
+          padding: EdgeInsets.only(top: SizeConstant.getHeightWithScreen(50)),
+          color: const Color(0xff757575),
+          child: Container(
             padding: EdgeInsets.only(top: SizeConstant.getHeightWithScreen(5)),
             decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                    topLeft:
-                        Radius.circular(SizeConstant.getHeightWithScreen(30)),
-                    topRight:
-                        Radius.circular(SizeConstant.getHeightWithScreen(30)))),
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(SizeConstant.getHeightWithScreen(30)),
+                topRight: Radius.circular(SizeConstant.getHeightWithScreen(30)),
+              ),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
@@ -591,21 +589,23 @@ class _JobSelectionModalState extends State<JobSelectionModal> {
                       child: Text(
                         "Job List",
                         style: TextStyle(
-                            color: Colors.black,
-                            fontFamily: "Outfit",
-                            fontWeight: FontWeight.w600,
-                            fontSize: SizeConstant.mediumFont),
+                          color: Colors.black,
+                          fontFamily: "Outfit",
+                          fontWeight: FontWeight.w600,
+                          fontSize: SizeConstant.mediumFont,
+                        ),
                       ),
                     ),
                     IconButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        icon: Icon(
-                          Icons.close,
-                          color: ColorConstant.grey2,
-                          size: SizeConstant.getHeightWithScreen(25),
-                        ))
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: Icon(
+                        Icons.close,
+                        color: ColorConstant.grey2,
+                        size: SizeConstant.getHeightWithScreen(25),
+                      ),
+                    ),
                   ],
                 ),
                 Container(
@@ -615,72 +615,276 @@ class _JobSelectionModalState extends State<JobSelectionModal> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: widget.jobList.length,
-                    itemBuilder: (context, index) => GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context, index.toString());
-                      },
-                      child: Container(
-                        margin: EdgeInsets.only(
+                    itemBuilder: (context, index) {
+                      final job = widget.jobList[index];
+                      final isSelected = selectedItems.contains(job.jobName);
+
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            if (isSelected) {
+                              selectedItems.remove(job.jobName); // Deselect
+                            } else {
+                              selectedItems.add(job.jobName); // Select
+                            }
+                          });
+                        },
+                        child: Container(
+                          margin: EdgeInsets.only(
                             top: SizeConstant.getHeightWithScreen(10),
                             left: SizeConstant.getHeightWithScreen(15),
-                            right: SizeConstant.getHeightWithScreen(15)),
-                        padding: EdgeInsets.only(
+                            right: SizeConstant.getHeightWithScreen(15),
+                          ),
+                          padding: EdgeInsets.only(
                             left: SizeConstant.getHeightWithScreen(16),
                             right: SizeConstant.getHeightWithScreen(16),
                             top: SizeConstant.getHeightWithScreen(16),
-                            bottom: SizeConstant.getHeightWithScreen(14)),
-                        decoration: BoxDecoration(
-                            color:
-                                selectedRadioValue == widget.jobList[index].id
-                                    ? ColorConstant.orange4
-                                    : ColorConstant.white,
+                            bottom: SizeConstant.getHeightWithScreen(14),
+                          ),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? ColorConstant.orange4
+                                : ColorConstant.white,
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
-                                width: SizeConstant.getHeightWithScreen(1),
-                                color: selectedRadioValue ==
-                                        widget.jobList[index].id
-                                    ? ColorConstant.white
-                                    : ColorConstant.vibBgColor)),
-                        child: Row(
-                          children: [
-                            Radio(
-                              value: widget.jobList[index].id,
-                              groupValue: selectedRadioValue,
-                              materialTapTargetSize:
-                                  MaterialTapTargetSize.shrinkWrap,
-                              onChanged: (value) {
-                                setState(() {
-                                  Navigator.pop(context, index.toString());
-                                });
-                              },
-                              fillColor:
-                                  MaterialStateProperty.resolveWith<Color>(
-                                      (Set<MaterialState> states) {
-                                if (states.contains(MaterialState.selected)) {
-                                  return ColorConstant.primaryColor;
-                                }
-                                return ColorConstant.bDisabledColor;
-                              }),
-                              visualDensity:
-                                  const VisualDensity(horizontal: -4),
+                              width: SizeConstant.getHeightWithScreen(1),
+                              color: isSelected
+                                  ? ColorConstant.white
+                                  : ColorConstant.vibBgColor,
                             ),
-                            SizedBox(
-                              width: SizeConstant.getHeightWithScreen(10),
-                            ),
-                            Text(
-                              widget.jobList[index].jobName,
-                              style:
-                                  TextStyle(fontSize: SizeConstant.mediumFont),
-                            ),
-                          ],
+                          ),
+                          child: Row(
+                            children: [
+                              Checkbox(
+                                value: isSelected,
+                                onChanged: (bool? value) {
+                                  setState(() {
+                                    if (value == true) {
+                                      selectedItems.add(job.jobName); // Select
+                                    } else {
+                                      selectedItems.remove(job.jobName); // Deselect
+                                    }
+                                  });
+                                },
+                                activeColor: ColorConstant.primaryColor,
+                              ),
+                              SizedBox(
+                                width: SizeConstant.getHeightWithScreen(10),
+                              ),
+                              Text(
+                                job.jobName,
+                                style: TextStyle(
+                                  fontSize: SizeConstant.mediumFont,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   ),
                 ),
+                const SizedBox(
+                        height: 60,
+                      )
               ],
-            )),
-      )),
+            ),
+          ),
+        ),
+      ),
+      Positioned(
+        bottom: 0,
+        left: 0,
+        right: 0,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+          decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                spreadRadius: 6,
+                blurRadius: 6,
+                offset: const Offset(0, -3),
+              ),
+            ],
+            color: Colors.white,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(15),
+              topRight: Radius.circular(15),
+            ),
+          ),
+          child: CommonButton(
+            btnHeight: SizeConstant.getHeightWithScreen(48),
+            onTap: () {
+              Navigator.pop(context, selectedItems); // Return selected items
+            },
+            label: 'add'.tr,
+            bgColor: ColorConstant.paymentBtnColor,
+            textColor: ColorConstant.white,
+            borderColor: ColorConstant.white,
+          ),
+        ),
+      ),
     ]);
   }
+  // @override
+  // Widget build(BuildContext context) {
+  //   return Stack(children: [
+  //     SingleChildScrollView(
+  //         child: Container(
+  //       padding: EdgeInsets.only(top: SizeConstant.getHeightWithScreen(50)),
+  //       color: const Color(0xff757575),
+  //       child: Container(
+  //           padding: EdgeInsets.only(top: SizeConstant.getHeightWithScreen(5)),
+  //           decoration: BoxDecoration(
+  //               color: Colors.white,
+  //               borderRadius: BorderRadius.only(
+  //                   topLeft:
+  //                       Radius.circular(SizeConstant.getHeightWithScreen(30)),
+  //                   topRight:
+  //                       Radius.circular(SizeConstant.getHeightWithScreen(30)))),
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.stretch,
+  //             children: <Widget>[
+  //               const SizedBox(height: 5.0),
+  //               Row(
+  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                 children: [
+  //                   Container(
+  //                     margin:
+  //                         const EdgeInsets.only(top: 0, left: 16, right: 10),
+  //                     child: Text(
+  //                       "Job List",
+  //                       style: TextStyle(
+  //                           color: Colors.black,
+  //                           fontFamily: "Outfit",
+  //                           fontWeight: FontWeight.w600,
+  //                           fontSize: SizeConstant.mediumFont),
+  //                     ),
+  //                   ),
+  //                   IconButton(
+  //                       onPressed: () {
+  //                         Navigator.pop(context);
+  //                       },
+  //                       icon: Icon(
+  //                         Icons.close,
+  //                         color: ColorConstant.grey2,
+  //                         size: SizeConstant.getHeightWithScreen(25),
+  //                       ))
+  //                 ],
+  //               ),
+  //               Container(
+  //                 margin: const EdgeInsets.only(top: 0, bottom: 27),
+  //                 child: ListView.builder(
+  //                   padding: EdgeInsets.zero,
+  //                   shrinkWrap: true,
+  //                   physics: const NeverScrollableScrollPhysics(),
+  //                   itemCount: widget.jobList.length,
+  //                   itemBuilder: (context, index) => GestureDetector(
+  //                     onTap: () {
+  //                       Navigator.pop(context, index.toString());
+  //                     },
+  //                     child: Container(
+  //                       margin: EdgeInsets.only(
+  //                           top: SizeConstant.getHeightWithScreen(10),
+  //                           left: SizeConstant.getHeightWithScreen(15),
+  //                           right: SizeConstant.getHeightWithScreen(15)),
+  //                       padding: EdgeInsets.only(
+  //                           left: SizeConstant.getHeightWithScreen(16),
+  //                           right: SizeConstant.getHeightWithScreen(16),
+  //                           top: SizeConstant.getHeightWithScreen(16),
+  //                           bottom: SizeConstant.getHeightWithScreen(14)),
+  //                       decoration: BoxDecoration(
+  //                           color:
+  //                               selectedRadioValue == widget.jobList[index].id
+  //                                   ? ColorConstant.orange4
+  //                                   : ColorConstant.white,
+  //                           borderRadius: BorderRadius.circular(10),
+  //                           border: Border.all(
+  //                               width: SizeConstant.getHeightWithScreen(1),
+  //                               color: selectedRadioValue ==
+  //                                       widget.jobList[index].id
+  //                                   ? ColorConstant.white
+  //                                   : ColorConstant.vibBgColor)),
+  //                       child: Row(
+  //                         children: [
+  //                           Radio(
+  //                             value: widget.jobList[index].id,
+  //                             groupValue: selectedRadioValue,
+  //                             materialTapTargetSize:
+  //                                 MaterialTapTargetSize.shrinkWrap,
+  //                             onChanged: (value) {
+  //                               setState(() {
+  //                                 Navigator.pop(context, index.toString());
+  //                               });
+  //                             },
+  //                             fillColor:
+  //                                 MaterialStateProperty.resolveWith<Color>(
+  //                                     (Set<MaterialState> states) {
+  //                               if (states.contains(MaterialState.selected)) {
+  //                                 return ColorConstant.primaryColor;
+  //                               }
+  //                               return ColorConstant.bDisabledColor;
+  //                             }),
+  //                             visualDensity:
+  //                                 const VisualDensity(horizontal: -4),
+  //                           ),
+  //                           SizedBox(
+  //                             width: SizeConstant.getHeightWithScreen(10),
+  //                           ),
+  //                           Text(
+  //                             widget.jobList[index].jobName,
+  //                             style:
+  //                                 TextStyle(fontSize: SizeConstant.mediumFont),
+  //                           ),
+  //                         ],
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ),
+  //               const SizedBox(
+  //                       height: 60,
+  //                     )
+  //             ],
+  //           )),
+  //     )),
+  //     Positioned(
+  //       bottom: 0,
+  //       left: 0,
+  //       right: 0,
+  //       child: Container(
+  //         padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+  //         decoration: BoxDecoration(
+  //           boxShadow: [
+  //             BoxShadow(
+  //               color: Colors.black.withOpacity(0.2),
+  //               spreadRadius: 6,
+  //               blurRadius: 6,
+  //               offset: const Offset(0, -3),
+  //             ),
+  //           ],
+  //           color: Colors.white,
+  //           borderRadius: const BorderRadius.only(
+  //             topLeft: Radius.circular(15),
+  //             topRight: Radius.circular(15),
+  //           ),
+  //         ),
+  //         child: CommonButton(
+  //           btnHeight: SizeConstant.getHeightWithScreen(48),
+  //           onTap: () {
+  //             if (selectedNumber.isNotEmpty) {
+  //               int index = int.parse(selectedNumber);
+  //             }
+  //             //   Navigator.pop(context, selectedNumber);
+  //           },
+  //           label: 'add'.tr,
+  //           bgColor: ColorConstant.paymentBtnColor,
+  //           textColor: ColorConstant.white,
+  //           borderColor: ColorConstant.white,
+  //         ),
+  //       ),
+  //     ),
+  //   ]);
+  // }
 }

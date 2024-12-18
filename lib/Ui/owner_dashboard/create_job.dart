@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:justconnect/Ui/owner_dashboard/owner_dashboard.dart';
 import 'package:justconnect/Ui/signup.dart';
 import 'package:justconnect/constants/color_constants.dart';
 import 'package:justconnect/constants/size_constants.dart';
@@ -37,7 +38,7 @@ class _CreateJobState extends State<CreateJob> {
   String imageUrl = "";
   File? _selfieImage; // To store the captured image
   final ImagePicker _picker = ImagePicker();
-  String resultId = "";
+  List<String> resultId = [];
   String jobResult = "";
   List<JobList> jobList = [];
   Future<void> _takeSelfie() async {
@@ -392,8 +393,7 @@ class _CreateJobState extends State<CreateJob> {
                           'flat_no':
                               _ownerController.faltNoController.text.trim(),
                           'date': _ownerController.dateController.text.trim(),
-                          'job_type':
-                              jobResult,
+                          'job_type': jsonEncode(resultId),
                           'job_status': "Active",
                           'owner_profile_image': imageUrl.trim(),
                           'phone_number': ownerPhoneNumber,
@@ -406,9 +406,11 @@ class _CreateJobState extends State<CreateJob> {
                         _ownerController.faltNoController.clear();
                         setState(() {
                           jobResult = "";
-                          resultId = "";
+                          resultId = [];
                           imageUrl = "";
                         });
+
+                         Get.off(() => const OwnerDashboard());
                       } on AuthException catch (e) {
                         // Handle Supabase-specific authentication errors
                         showDownloadSnackbar("Login failed: ${e.message}");
@@ -439,17 +441,17 @@ class _CreateJobState extends State<CreateJob> {
   }
 
   _showModal(List<JobList> jobList) async {
-    final result = await showModalBottomSheet<String>(
+    final result = await showModalBottomSheet<List<String>>(
         context: context,
         isScrollControlled: true,
         isDismissible: false,
         builder: (context) =>
             JobSelectionModal(jobList: jobList, resultId: resultId));
     if (result != null) {
-      int index = int.parse(result);
+      //int index = int.parse(result);
       setState(() {
-        jobResult = jobList[index].jobName ?? "";
-        resultId = jobList[index].id.toString() ?? "";
+        jobResult = result.toString(); //jobList[index].jobName ?? "";
+        resultId = result; //jobList[index].id.toString() ?? "";
       });
     }
   }

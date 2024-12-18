@@ -116,6 +116,7 @@ class _LoginState extends State<Login> {
                             final String name = response['name'];
                             storage.write("Name", name.toString());
                             storage.write("UserId", id.toString());
+                            storage.write("SignUpType", signUpType.toString());
                             storage.write(
                                 "phone_number", phoneNumber.toString());
 

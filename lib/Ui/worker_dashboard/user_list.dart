@@ -27,11 +27,12 @@ class _HomeState extends State<UserList> {
   final WorkerController _ownerController = Get.put(WorkerController());
   List<UserDetails> userList = [];
   final storage = GetStorage();
+  String signUpType = "";
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
-        String signUpType = storage.read('SignUpType');
+        signUpType = storage.read('SignUpType');
         fetchAllUsers(signUpType);
       });
     });
@@ -44,7 +45,11 @@ class _HomeState extends State<UserList> {
       final response = await Supabase.instance.client
           .from('user') // Replace 'users' with your table name
           .select()
-          .eq('sign_up_type', signUpType.toString() == "Owner" ? "Maid" : "Owner"); // Fetch all rows
+          .eq(
+              'sign_up_type',
+              signUpType.toString() == "Owner"
+                  ? "Maid"
+                  : "Owner"); // Fetch all rows
 
       if (response.isNotEmpty) {
         print('User List: $response');
@@ -133,7 +138,7 @@ class _HomeState extends State<UserList> {
                       padding: EdgeInsets.only(
                           left: SizeConstant.getHeightWithScreen(15)),
                       child: Text(
-                        Strings.userDetails,
+                        signUpType == "Owner" ? "Maid List" : "Owner List",
                         style: TextStyle(
                           color: ColorConstant.black.withOpacity(0.88),
                           fontSize: SizeConstant.largeFont,
@@ -257,17 +262,21 @@ class _HomeState extends State<UserList> {
                                         ),
                                       ),
                                       SizedBox(
-                                        height: SizeConstant.getHeightWithScreen(4),
+                                        height:
+                                            SizeConstant.getHeightWithScreen(4),
                                       ),
-                                      Text(
-                                        job.jobType,
-                                        style: TextStyle(
-                                          overflow: TextOverflow.visible,
-                                          fontSize: SizeConstant.xSmallFont,
-                                          fontWeight: FontWeight.w500,
-                                          color: ColorConstant.grey26,
-                                        ),
-                                      ),
+                                      signUpType == "Owner"
+                                          ? Text(
+                                             job.jobType.isEmpty || job.jobType == [] ? "" :  jobTypeConvert(job.jobType),
+                                              style: TextStyle(
+                                                overflow: TextOverflow.visible,
+                                                fontSize:
+                                                    SizeConstant.xSmallFont,
+                                                fontWeight: FontWeight.w500,
+                                                color: ColorConstant.grey26,
+                                              ),
+                                            )
+                                          : const SizedBox(),
                                     ],
                                   ))
                                 ],
@@ -287,5 +296,11 @@ class _HomeState extends State<UserList> {
         ),
       ),
     );
+  }
+
+  String jobTypeConvert(String job) {
+    List<String> jobTypes = List<String>.from(jsonDecode(job));
+    String jobTypesString = jobTypes.join(', ');
+    return jobTypesString;
   }
 }
