@@ -114,7 +114,7 @@ class _JobDetailPageState extends State<JobDetailPage> {
     return SafeArea(
       top: false,
       child: Scaffold(
-        backgroundColor: ColorConstant.white,
+        backgroundColor: ColorConstant.backgroundColor,
         body: Padding(
           padding: EdgeInsets.only(
               left: SizeConstant.getHeightWithScreen(15),
