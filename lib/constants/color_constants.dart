@@ -230,4 +230,5 @@ class ColorConstant {
   static var activeGreen = const Color(0xff30C168);
   static var carousalUnselectedColor = const Color(0xffC27A23);
   static var darkGreayColor = const Color(0xFF2F3044);
+  static var backgroundColor = const Color(0xFFEFFAFF);
 }

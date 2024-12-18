@@ -12,6 +12,7 @@ import 'package:justconnect/model/job_list.dart';
 import 'package:justconnect/widget/helper.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:time_range_picker/time_range_picker.dart';
 import '../constants/color_constants.dart';
 import '../constants/size_constants.dart';
 import '../widget/commontextInputfield.dart';
@@ -33,6 +34,9 @@ class _SignUpState extends State<SignUp> {
   List<String> resultId = [];
   String jobResult = "";
   List<JobList> jobList = [];
+  TimeRange? timeRange;
+  TimeOfDay? startTime;
+  TimeOfDay? endTime;
 
   @override
   void initState() {
@@ -144,7 +148,7 @@ class _SignUpState extends State<SignUp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorConstant.white,
+      backgroundColor: ColorConstant.backgroundColor,
       body: SingleChildScrollView(
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -373,6 +377,25 @@ class _SignUpState extends State<SignUp> {
                           ],
                         ),
                   SizedBox(height: SizeConstant.getHeightWithScreen(10)),
+                  _userType == "Owner"
+                      ? const SizedBox()
+                  : InkWell(
+                    onTap: () async {
+                      timeRange = await showTimeRangePicker(
+                        context: context,
+                      );
+                      print("result ${timeRange?.startTime} to${timeRange?.endTime}");
+                      if (timeRange != null) {
+                        setState(() {
+                          startTime = timeRange?.startTime;
+                          endTime = timeRange?.endTime;
+                        });
+                      }
+                    },
+                    child: Text('Time Range${formatTime(startTime)} ${formatTime(endTime)}',
+                    ),
+                  ),
+                  SizedBox(height: SizeConstant.getHeightWithScreen(10)),
                   TextField(
                     controller: _loginController.passwordController,
                     decoration: InputDecoration(
@@ -527,6 +550,14 @@ class _SignUpState extends State<SignUp> {
       ),
     );
   }
+
+  String formatTime(TimeOfDay? time) {
+    if (time == null) return '';
+    final now = DateTime.now();
+    final formattedTime = TimeOfDay(hour: time.hour, minute: time.minute).format(context);
+    return formattedTime;
+  }
+
 
   _showModal(List<JobList> jobList) async {
     final result = await showModalBottomSheet<List<String>>(

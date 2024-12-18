@@ -138,7 +138,7 @@ class _CreateJobState extends State<CreateJob> {
     return SafeArea(
       top: false,
       child: Scaffold(
-        backgroundColor: ColorConstant.white,
+        backgroundColor: ColorConstant.backgroundColor,
         body: Column(
           children: [
             SizedBox(

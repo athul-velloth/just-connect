@@ -27,7 +27,7 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorConstant.white,
+      backgroundColor: ColorConstant.backgroundColor,
       body: Container(
         margin: const EdgeInsets.all(24),
         child: Column(
