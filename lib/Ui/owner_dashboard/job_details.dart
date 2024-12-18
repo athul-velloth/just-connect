@@ -27,20 +27,30 @@ class JobDetails extends StatefulWidget {
 
 class _JobDetailsState extends State<JobDetails> {
   void _launchWhatsApp(String number) async {
-    final url = 'https://wa.me/$number';
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch WhatsApp';
+    String url = 'https://wa.me/$number';
+    try {
+      if (await canLaunch(url)) {
+        await launch(url);
+      } else {
+        throw 'Could not launch $url';
+      }
+    } catch (e) {
+      print('Error launching WhatsApp: $e');
     }
   }
 
+
+
   void _makePhoneCall(String number) async {
-    final url = 'tel:$number';
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not make the phone call';
+    String url = 'tel:$number';
+     try {
+      if (await canLaunch(url)) {
+        await launch(url);
+      } else {
+        throw 'Could not launch $url';
+      }
+    } catch (e) {
+      print('Error launching phone call: $e');
     }
   }
 

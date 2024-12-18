@@ -28,20 +28,28 @@ class JobDetailPage extends StatefulWidget {
 
 class _JobDetailPageState extends State<JobDetailPage> {
   void _launchWhatsApp(String number) async {
-    final url = 'https://wa.me/$number';
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch WhatsApp';
+    String url = 'https://wa.me/$number';
+    try {
+      if (await canLaunch(url)) {
+        await launch(url);
+      } else {
+        throw 'Could not launch $url';
+      }
+    } catch (e) {
+      print('Error launching WhatsApp: $e');
     }
   }
 
   void _makePhoneCall(String number) async {
-    final url = 'tel:$number';
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not make the phone call';
+    String url = 'tel:$number';
+    try {
+      if (await canLaunch(url)) {
+        await launch(url);
+      } else {
+        throw 'Could not launch $url';
+      }
+    } catch (e) {
+      print('Error launching phone call: $e');
     }
   }
 
@@ -68,7 +76,7 @@ class _JobDetailPageState extends State<JobDetailPage> {
     try {
       Helper.progressDialog(context, "Loading...");
       final response = await Supabase.instance.client
-            .from('job_create_list')
+          .from('job_create_list')
           .update({'job_status': newStatus}) // Update the `job_status`
           .eq('id', jobId)
           .select(); // Filter by the job ID or any unique column
@@ -76,7 +84,7 @@ class _JobDetailPageState extends State<JobDetailPage> {
       if (response.isNotEmpty) {
         Helper.close();
         showDownloadSnackbar("Job Accepted!");
-         Get.off(() => const Home());
+        Get.off(() => const Home());
       } else {
         Helper.close();
         showDownloadSnackbar("Error updating job status: ${response}");
