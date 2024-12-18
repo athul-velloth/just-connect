@@ -29,7 +29,7 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> with RouteAware{
+class _HomeState extends State<Home> with RouteAware {
   final WorkerController _ownerController = Get.put(WorkerController());
   List<JobDetailsModel> userList = [];
   List<String> resultId = [];
@@ -380,7 +380,7 @@ class _HomeState extends State<Home> with RouteAware{
                                                   5),
                                         ),
                                         Text(
-                                          job.ownerName,
+                                          job.title.toString(),
                                           style: TextStyle(
                                             overflow: TextOverflow.ellipsis,
                                             fontSize: SizeConstant.mediumFont,

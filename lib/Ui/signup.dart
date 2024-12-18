@@ -300,7 +300,9 @@ class _SignUpState extends State<SignUp> {
                   TextField(
                     controller: _loginController.emailController,
                     decoration: InputDecoration(
-                        hintText: "Enter Email",
+                        hintText: _userType == "Owner"
+                            ? "Enter Email"
+                            : "Enter Username",
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(18),
                             borderSide: BorderSide.none),
@@ -454,7 +456,7 @@ class _SignUpState extends State<SignUp> {
                                       startTime = timeRange?.startTime;
                                       endTime = timeRange?.endTime;
                                       _loginController.timeController.text =
-                                          "${formatTime(startTime)} ${formatTime(endTime)}";
+                                          "${formatTime(startTime)} - ${formatTime(endTime)}";
                                     });
                                   }
                                 },
@@ -528,9 +530,14 @@ class _SignUpState extends State<SignUp> {
                         _loginController.nameController.text.length < 3) {
                       // Show error if fields are empty
                       showDownloadSnackbar("Please enter the name");
-                    } else if (!regex.hasMatch(
-                        _loginController.emailController.text.trim())) {
+                    } else if (_userType == "Owner" &&
+                        !regex.hasMatch(
+                            _loginController.emailController.text.trim())) {
                       showDownloadSnackbar("Please enter the valid email");
+                    } else if (_userType == "Maid" &&
+                        (_loginController.emailController.text.trim().isEmpty ||
+                            _loginController.emailController.text.length < 3)) {
+                      showDownloadSnackbar("Please enter the valid username");
                     } else if (_loginController.mobileNoController.text
                             .trim()
                             .length <
@@ -580,9 +587,12 @@ class _SignUpState extends State<SignUp> {
                           'sign_up_type': _userType.trim(),
                           'image_url': imageUrl,
                           'uploaded_at': DateTime.now().toIso8601String(),
-                          'price' : _loginController.priceController.text.isEmpty ? "0" : _loginController.priceController.text.trim(),
-                          'city' : _loginController.cityController.text.trim(),
-                          'available_time' : _loginController.timeController.text.trim()
+                          'price': _loginController.priceController.text.isEmpty
+                              ? "0"
+                              : _loginController.priceController.text.trim(),
+                          'city': _loginController.cityController.text.trim(),
+                          'available_time':
+                              _loginController.timeController.text.trim()
                         }).select();
                         // final response = await Supabase.instance.client.auth
                         //     .signUp(
@@ -622,7 +632,7 @@ class _SignUpState extends State<SignUp> {
                         Helper.close();
                         // Handle Supabase-specific authentication errors
                         showDownloadSnackbar("Login failed: ${e.message}");
-                         print("${e.message}");
+                        print("${e.message}");
                       } catch (e) {
                         Helper.close();
                         // Handle unexpected errors
@@ -637,7 +647,7 @@ class _SignUpState extends State<SignUp> {
                       //  Get.to(() => const Home());
                     }
                   },
-                  label: 'Sign Up'),
+                  label: 'SignUp'),
               SizedBox(height: SizeConstant.getHeightWithScreen(10)),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,

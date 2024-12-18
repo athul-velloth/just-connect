@@ -40,13 +40,13 @@ class _LoginState extends State<Login> {
                 TextField(
                   controller: emailController,
                   decoration: InputDecoration(
-                      hintText: "Email",
+                      hintText: "Username",
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(18),
                           borderSide: BorderSide.none),
                       fillColor: Colors.purple.withOpacity(0.1),
                       filled: true,
-                      prefixIcon: const Icon(Icons.email)),
+                      prefixIcon: const Icon(Icons.person)),
                 ),
                 SizedBox(height: SizeConstant.getHeightWithScreen(10)),
                 TextField(
@@ -79,14 +79,16 @@ class _LoginState extends State<Login> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                               content:
-                                  Text('Please enter both email and password')),
+                                  Text('Please enter both username and password')),
                         );
-                      } else if (!regex.hasMatch(emailController.text.trim())) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Please enter valid email')),
-                        );
-                      } else {
+                      } 
+                      // else if (!regex.hasMatch(emailController.text.trim())) {
+                      //   ScaffoldMessenger.of(context).showSnackBar(
+                      //     const SnackBar(
+                      //         content: Text('Please enter valid email')),
+                      //   );
+                      // } 
+                      else {
                         setState(() {
                           // _loading = true;
                         });
