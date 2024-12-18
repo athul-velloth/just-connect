@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:intl/intl.dart';
 import 'package:justconnect/Ui/owner_dashboard/owner_dashboard.dart';
+import 'package:justconnect/Ui/worker_dashboard/home.dart';
 import 'package:justconnect/constants/color_constants.dart';
 import 'package:justconnect/constants/size_constants.dart';
 import 'package:justconnect/constants/strings.dart';
@@ -75,7 +76,7 @@ class _JobDetailPageState extends State<JobDetailPage> {
       if (response.isNotEmpty) {
         Helper.close();
         showDownloadSnackbar("Job Accepted!");
-         Get.off(() => const OwnerDashboard());
+         Get.off(() => const Home());
       } else {
         Helper.close();
         showDownloadSnackbar("Error updating job status: ${response}");
