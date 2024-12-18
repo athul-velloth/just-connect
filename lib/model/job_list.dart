@@ -2,11 +2,17 @@ class JobList {
   final int id;
   final String createdAt;
   final String jobName;
+  final int priceHr;
+  final String location;
+  final String time;
 
   JobList({
     required this.id,
     required this.createdAt,
     required this.jobName,
+    required this.priceHr,
+    required this.location,
+    required this.time,
   });
 
   // Factory method to create a User instance from JSON
@@ -15,6 +21,9 @@ class JobList {
       id: json['id'] as int,
       createdAt: json['created_at'] as String,
       jobName: json['job_name'] as String,
+      priceHr: json['price_hr'] as int,
+      location: json['location'] as String,
+      time: json['time'] as String,
     );
   }
 
@@ -24,6 +33,9 @@ class JobList {
       'id': id,
       'created_at': createdAt,
       'job_name': jobName,
+      'price_hr': priceHr,
+      'location': location,
+      'time': time,
     };
   }
 }

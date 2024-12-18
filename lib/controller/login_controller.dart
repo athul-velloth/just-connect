@@ -16,4 +16,7 @@ class LoginController extends GetxController {
   final TextEditingController faltNoController = TextEditingController();
   final TextEditingController mobileNoController = TextEditingController();
   final TextEditingController typeController = TextEditingController();
+  final TextEditingController priceController = TextEditingController();
+  final TextEditingController cityController = TextEditingController();
+  final TextEditingController timeController = TextEditingController();
 }

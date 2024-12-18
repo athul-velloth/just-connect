@@ -13,6 +13,7 @@ import 'package:justconnect/controller/worker_controller.dart';
 import 'package:justconnect/model/user_details.dart';
 import 'package:justconnect/widget/helper.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../constants/color_constants.dart';
 import '../../constants/size_constants.dart';
@@ -230,14 +231,13 @@ class _HomeState extends State<UserList> {
                                         children: [
                                           Expanded(
                                             child: Text(
-                                              dateConvert(
-                                                  job.createdAt.toString()),
+                                              job.name,
                                               style: TextStyle(
                                                 overflow: TextOverflow.ellipsis,
                                                 fontSize:
-                                                    SizeConstant.xSmallFont,
-                                                fontWeight: FontWeight.w500,
-                                                color: ColorConstant.grey26,
+                                                    SizeConstant.mediumFont,
+                                                fontWeight: FontWeight.w600,
+                                                color: ColorConstant.black3,
                                               ),
                                             ),
                                           ),
@@ -252,23 +252,6 @@ class _HomeState extends State<UserList> {
                                           //       .getHeightWithScreen(12),
                                           // ),
                                         ],
-                                      ),
-                                      SizedBox(
-                                        height:
-                                            SizeConstant.getHeightWithScreen(5),
-                                      ),
-                                      Text(
-                                        job.name,
-                                        style: TextStyle(
-                                          overflow: TextOverflow.ellipsis,
-                                          fontSize: SizeConstant.mediumFont,
-                                          fontWeight: FontWeight.w600,
-                                          color: ColorConstant.black3,
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height:
-                                            SizeConstant.getHeightWithScreen(4),
                                       ),
                                       signUpType == "Owner"
                                           ? Text(
@@ -285,6 +268,147 @@ class _HomeState extends State<UserList> {
                                               ),
                                             )
                                           : const SizedBox(),
+                                      signUpType == "Owner"
+                                          ? Column(
+                                            crossAxisAlignment:  CrossAxisAlignment.start,
+                                              children: [
+                                                SizedBox(
+                                                  height: SizeConstant
+                                                      .getHeightWithScreen(2),
+                                                ),
+                                                Text(
+                                                  job.price == null
+                                                      ? "0"
+                                                      : job.price.toString(),
+                                                  style: TextStyle(
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    fontSize:
+                                                        SizeConstant.xSmallFont,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: ColorConstant.grey26,
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  height: SizeConstant
+                                                      .getHeightWithScreen(4),
+                                                ),
+                                                Text(
+                                                  job.city.toString(),
+                                                  style: TextStyle(
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    fontSize:
+                                                        SizeConstant.xSmallFont,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: ColorConstant.grey26,
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  height: SizeConstant
+                                                      .getHeightWithScreen(4),
+                                                ),
+                                                Text(
+                                                  job.availableTime.toString(),
+                                                  style: TextStyle(
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    fontSize:
+                                                        SizeConstant.xSmallFont,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: ColorConstant.grey26,
+                                                  ),
+                                                ),
+                                              ],
+                                            )
+                                          : Column(
+                                             crossAxisAlignment:  CrossAxisAlignment.start,
+                                              children: [
+                                                SizedBox(
+                                                  height: SizeConstant
+                                                      .getHeightWithScreen(4),
+                                                ),
+                                                Text(
+                                                  "Flat No : ${job.flatNo}",
+                                                  style: TextStyle(
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    fontSize:
+                                                        SizeConstant.xSmallFont,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: ColorConstant.grey26,
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  height: SizeConstant
+                                                      .getHeightWithScreen(0),
+                                                ),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                      job.phoneNumber
+                                                          .toString(),
+                                                      style: TextStyle(
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        fontSize: SizeConstant
+                                                            .xSmallFont,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: ColorConstant
+                                                            .grey26,
+                                                      ),
+                                                    ),
+                                                    Row(children: [
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          _makePhoneCall(job
+                                                              .phoneNumber
+                                                              .toString());
+                                                        },
+                                                        child: Image(
+                                                          image: const AssetImage(
+                                                              "assets/images/phone.png"),
+                                                          height: SizeConstant
+                                                              .getHeightWithScreen(
+                                                                  24),
+                                                          width: SizeConstant
+                                                              .getHeightWithScreen(
+                                                                  24),
+                                                        ),
+                                                      ),
+                                                      SizedBox(
+                                                        width: SizeConstant
+                                                            .getHeightWithScreen(
+                                                                10),
+                                                      ),
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          _launchWhatsApp(job
+                                                              .phoneNumber
+                                                              .toString());
+                                                        },
+                                                        child: Image(
+                                                          image:
+                                                              const AssetImage(
+                                                            "assets/images/whatsapp.png",
+                                                          ),
+                                                          height: SizeConstant
+                                                              .getHeightWithScreen(
+                                                                  24),
+                                                          width: SizeConstant
+                                                              .getHeightWithScreen(
+                                                                  24),
+                                                        ),
+                                                      ),
+                                                    ]),
+                                                  ],
+                                                )
+                                              ],
+                                            )
                                     ],
                                   ))
                                 ],
@@ -304,6 +428,24 @@ class _HomeState extends State<UserList> {
         ),
       ),
     );
+  }
+
+  void _launchWhatsApp(String number) async {
+    final url = 'https://wa.me/$number';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch WhatsApp';
+    }
+  }
+
+  void _makePhoneCall(String number) async {
+    final url = 'tel:$number';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not make the phone call';
+    }
   }
 
   String jobTypeConvert(String job) {

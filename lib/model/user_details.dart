@@ -10,20 +10,24 @@ class UserDetails {
   final String signUpType;
   final String? imageUrl;
   final String? uploadedAt;
-
-  UserDetails({
-    required this.id,
-    required this.createdAt,
-    required this.email,
-    required this.password,
-    required this.name,
-    required this.phoneNumber,
-    required this.flatNo,
-    required this.jobType,
-    required this.signUpType,
-    this.imageUrl,
-    this.uploadedAt,
-  });
+  final int? price;
+  final String? city;
+  final String? availableTime;
+  UserDetails(
+      {required this.id,
+      required this.createdAt,
+      required this.email,
+      required this.password,
+      required this.name,
+      required this.phoneNumber,
+      required this.flatNo,
+      required this.jobType,
+      required this.signUpType,
+      this.imageUrl,
+      this.uploadedAt,
+      this.price,
+      this.city,
+      this.availableTime});
 
   // Factory method to create a User instance from JSON
   factory UserDetails.fromJson(Map<String, dynamic> json) {
@@ -39,6 +43,9 @@ class UserDetails {
       signUpType: json['sign_up_type'] as String,
       imageUrl: json['image_url'] as String?,
       uploadedAt: json['uploaded_at'] as String?,
+      price: json['price'] as int?,
+      city: json['city'] as String?,
+      availableTime: json['available_time'] as String?,
     );
   }
 
@@ -52,10 +59,13 @@ class UserDetails {
       'name': name,
       'phone_number': phoneNumber,
       'flat_no': flatNo,
-      //  'job_type': jobType,
+      'job_type': jobType,
       'sign_up_type': signUpType,
       'image_url': imageUrl,
       'uploaded_at': uploadedAt,
+      'price': price,
+      'city': city,
+      'available_time': availableTime,
     };
   }
 }

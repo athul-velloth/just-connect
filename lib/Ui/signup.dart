@@ -212,9 +212,20 @@ class _SignUpState extends State<SignUp> {
                       onPressed: () {
                         setState(() {
                           _userType = 'Owner';
+                          _loginController.nameController.clear();
+                          _loginController.emailController.clear();
+                          _loginController.mobileNoController.clear();
+                          _loginController.faltNoController.clear();
+                          _loginController.passwordController.clear();
+                          _loginController.confirmPasswordController.clear();
                           _loginController.typeController.clear();
-                          resultId = [];
+                          _loginController.priceController.clear();
+                          _loginController.cityController.clear();
+                          _loginController.timeController.clear();
                           jobResult = "";
+                          resultId = [];
+                          imageUrl = "";
+                          _selfieImage = null;
                         });
                       },
                       style: ElevatedButton.styleFrom(
@@ -234,6 +245,20 @@ class _SignUpState extends State<SignUp> {
                       onPressed: () {
                         setState(() {
                           _userType = 'Maid';
+                          _loginController.nameController.clear();
+                          _loginController.emailController.clear();
+                          _loginController.mobileNoController.clear();
+                          _loginController.faltNoController.clear();
+                          _loginController.passwordController.clear();
+                          _loginController.confirmPasswordController.clear();
+                          _loginController.typeController.clear();
+                          _loginController.priceController.clear();
+                          _loginController.cityController.clear();
+                          _loginController.timeController.clear();
+                          jobResult = "";
+                          resultId = [];
+                          imageUrl = "";
+                          _selfieImage = null;
                         });
                       },
                       style: ElevatedButton.styleFrom(
@@ -287,18 +312,22 @@ class _SignUpState extends State<SignUp> {
                         filled: true,
                         prefixIcon: const Icon(Icons.phone)),
                   ),
-                  SizedBox(height: SizeConstant.getHeightWithScreen(10)),
-                  TextField(
-                    controller: _loginController.faltNoController,
-                    decoration: InputDecoration(
-                        hintText: "Enter Flat No.",
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(18),
-                            borderSide: BorderSide.none),
-                        fillColor: Colors.purple.withOpacity(0.1),
-                        filled: true,
-                        prefixIcon: const Icon(Icons.home)),
-                  ),
+                  SizedBox(
+                      height: SizeConstant.getHeightWithScreen(
+                          _userType == "Owner" ? 10 : 0)),
+                  _userType == "Owner"
+                      ? TextField(
+                          controller: _loginController.faltNoController,
+                          decoration: InputDecoration(
+                              hintText: "Enter Flat No.",
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(18),
+                                  borderSide: BorderSide.none),
+                              fillColor: Colors.purple.withOpacity(0.1),
+                              filled: true,
+                              prefixIcon: const Icon(Icons.home)),
+                        )
+                      : const SizedBox(),
                   SizedBox(
                       height: SizeConstant.getHeightWithScreen(
                           _userType == "Owner" ? 0 : 10)),
@@ -372,6 +401,54 @@ class _SignUpState extends State<SignUp> {
                             ),
                           ],
                         ),
+                  _userType == "Maid"
+                      ? Column(
+                          children: [
+                            SizedBox(
+                                height: SizeConstant.getHeightWithScreen(10)),
+                            TextField(
+                              keyboardType: TextInputType.number,
+                              controller: _loginController.priceController,
+                              decoration: InputDecoration(
+                                  hintText: "Enter Price per hour.",
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(18),
+                                      borderSide: BorderSide.none),
+                                  fillColor: Colors.purple.withOpacity(0.1),
+                                  filled: true,
+                                  prefixIcon: const Icon(Icons.price_change)),
+                            ),
+                            SizedBox(
+                                height: SizeConstant.getHeightWithScreen(10)),
+                            TextField(
+                              keyboardType: TextInputType.text,
+                              controller: _loginController.cityController,
+                              decoration: InputDecoration(
+                                  hintText: "Enter city",
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(18),
+                                      borderSide: BorderSide.none),
+                                  fillColor: Colors.purple.withOpacity(0.1),
+                                  filled: true,
+                                  prefixIcon: const Icon(Icons.location_city)),
+                            ),
+                            SizedBox(
+                                height: SizeConstant.getHeightWithScreen(10)),
+                            TextField(
+                              keyboardType: TextInputType.number,
+                              controller: _loginController.timeController,
+                              decoration: InputDecoration(
+                                  hintText: "Enter time(from and to time)",
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(18),
+                                      borderSide: BorderSide.none),
+                                  fillColor: Colors.purple.withOpacity(0.1),
+                                  filled: true,
+                                  prefixIcon: const Icon(Icons.timelapse)),
+                            )
+                          ],
+                        )
+                      : const SizedBox(),
                   SizedBox(height: SizeConstant.getHeightWithScreen(10)),
                   TextField(
                     controller: _loginController.passwordController,
@@ -426,13 +503,21 @@ class _SignUpState extends State<SignUp> {
                             .length <
                         10) {
                       showDownloadSnackbar("Please enter the valid number");
-                    } else if (_loginController.faltNoController.text
-                        .trim()
-                        .isEmpty) {
+                    } else if (_userType == "Owner" &&
+                        _loginController.faltNoController.text.trim().isEmpty) {
                       showDownloadSnackbar("Please enter the flat no");
                     } else if (_userType == "Maid" &&
                         jobResult.trim().isEmpty) {
                       showDownloadSnackbar("Please enter the job type");
+                    } else if (_userType == "Maid" &&
+                        _loginController.priceController.text.trim().isEmpty) {
+                      showDownloadSnackbar("Please enter your per hour price");
+                    } else if (_userType == "Maid" &&
+                        _loginController.cityController.text.trim().isEmpty) {
+                      showDownloadSnackbar("Please enter your city");
+                    } else if (_userType == "Maid" &&
+                        _loginController.timeController.text.trim().isEmpty) {
+                      showDownloadSnackbar("Please enter your time");
                     } else if (_loginController.passwordController.text
                         .trim()
                         .isEmpty) {
@@ -472,15 +557,23 @@ class _SignUpState extends State<SignUp> {
                         // Check for successful sign-in
                         // if (response.user != null) {
                         showDownloadSnackbar("SignUP successful");
-                        _loginController.nameController.clear();
-                        _loginController.emailController.clear();
-                        _loginController.mobileNoController.clear();
-                        _loginController.faltNoController.clear();
-                        _loginController.passwordController.clear();
-                        _loginController.confirmPasswordController.clear();
-                        _loginController.typeController.clear();
-                        jobResult = "";
-                        resultId = [];
+                        setState(() {
+                          _loginController.nameController.clear();
+                          _loginController.emailController.clear();
+                          _loginController.mobileNoController.clear();
+                          _loginController.faltNoController.clear();
+                          _loginController.passwordController.clear();
+                          _loginController.confirmPasswordController.clear();
+                          _loginController.typeController.clear();
+                          _loginController.priceController.clear();
+                          _loginController.cityController.clear();
+                          _loginController.timeController.clear();
+                          jobResult = "";
+                          resultId = [];
+                          imageUrl = "";
+                          _selfieImage = null;
+                        });
+
                         Helper.close();
                         Get.off(() => const Login());
                         //   Get.to(() => const Home());
