@@ -10,6 +10,7 @@ import 'package:justconnect/Ui/owner_dashboard/owner_dashboard.dart';
 import 'package:justconnect/Ui/worker_dashboard/user_list.dart';
 import 'package:justconnect/constants/strings.dart';
 import 'package:justconnect/controller/worker_controller.dart';
+import 'package:justconnect/main.dart';
 import 'package:justconnect/model/job_details_model.dart';
 import 'package:justconnect/model/job_list.dart';
 import 'package:justconnect/model/user_details.dart';
@@ -25,7 +26,7 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<Home> with RouteAware{
   final WorkerController _ownerController = Get.put(WorkerController());
   List<JobDetailsModel> userList = [];
   List<String> resultId = [];
@@ -36,6 +37,22 @@ class _HomeState extends State<Home> {
     fetchAllUsers();
     fetchAllJob();
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final ModalRoute<dynamic>? route = ModalRoute.of(context);
+    if (route is PageRoute) {
+      routeObserver.subscribe(this, route);
+    }
+  }
+
+  @override
+  void didPopNext() {
+    super.didPopNext();
+    fetchAllUsers();
+    fetchAllJob();
   }
 
   Future<void> fetchAllUsers() async {
