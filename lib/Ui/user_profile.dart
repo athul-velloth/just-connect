@@ -1,31 +1,45 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
-import 'package:justconnect/Ui/owner_dashboard/owner_dashboard.dart';
+import 'package:justconnect/Ui/login.dart';
 import 'package:justconnect/constants/color_constants.dart';
 import 'package:justconnect/constants/size_constants.dart';
 import 'package:justconnect/constants/strings.dart';
 import 'package:justconnect/model/Job.dart';
 import 'package:justconnect/model/job_details_model.dart';
 import 'package:justconnect/model/user_details.dart';
-import 'package:justconnect/widget/helper.dart';
 import 'package:justconnect/widget/ventas_primary_button.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class JobDetails extends StatefulWidget {
-  final JobDetailsModel job;
-
-  const JobDetails({Key? key, required this.job}) : super(key: key);
+class UserProfile extends StatefulWidget {
+  const UserProfile({Key? key}) : super(key: key);
 
   @override
-  State<JobDetails> createState() => _JobDetailsState();
+  State<UserProfile> createState() => _UserProfileState();
 }
 
-class _JobDetailsState extends State<JobDetails> {
+class _UserProfileState extends State<UserProfile> {
+  String imageUrl = "";
+  String name = "";
+  String phoneNumber = "";
+  final storage = GetStorage();
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        name = storage.read('Name');
+        imageUrl = storage.read('ImageUrl') ?? "";
+        phoneNumber = storage.read('phone_number') ?? "";
+      });
+    });
+    super.initState();
+  }
+
   void _launchWhatsApp(String number) async {
     final url = 'https://wa.me/$number';
     if (await canLaunch(url)) {
@@ -61,58 +75,6 @@ class _JobDetailsState extends State<JobDetails> {
     // Format the DateTime to the desired format (yyyy-MM-dd)
     String formattedDate = DateFormat('yyyy-MM-dd').format(dateTime);
     return formattedDate;
-  }
-
-  Future<void> updateJobStatus(String jobId, String newStatus) async {
-    try {
-      Helper.progressDialog(context, "Loading...");
-      final response = await Supabase.instance.client
-          .from('job_create_list')
-          .update({'job_status': newStatus}) // Update the `job_status`
-          .eq('id', jobId)
-          .select(); // Filter by the job ID or any unique column
-
-      if (response.isNotEmpty) {
-        Helper.close();
-        if (newStatus == "Deactive") {
-          showDownloadSnackbar("Job Deactive!");
-        } else {
-          showDownloadSnackbar("Job Completed!");
-        }
-        Get.off(() => const OwnerDashboard());
-        print('Job status updated successfully: $response');
-      } else {
-        Helper.close();
-        showDownloadSnackbar(
-            "Error updating job status: ${response}");
-        print('Error updating job status: ${response}');
-      }
-    } catch (e) {
-      Helper.close();
-      print('Exception while updating job status: $e');
-      showDownloadSnackbar("Exception while updating job status: $e");
-    }
-  }
-
-  String jobTypeConvert(String job) {
-    List<String> jobTypes = List<String>.from(jsonDecode(job));
-    String jobTypesString = jobTypes.join(', ');
-    return jobTypesString;
-  }
-
-  Future<void> showDownloadSnackbar(String message) async {
-    Future.delayed(const Duration(milliseconds: 100), () {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            message,
-          ),
-          backgroundColor: Colors.black,
-          duration: const Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    });
   }
 
   @override
@@ -176,7 +138,7 @@ class _JobDetailsState extends State<JobDetails> {
                                 padding: EdgeInsets.only(
                                     left: SizeConstant.getHeightWithScreen(15)),
                                 child: Text(
-                                  Strings.jobDetails,
+                                  Strings.profile,
                                   style: TextStyle(
                                     color:
                                         ColorConstant.black.withOpacity(0.88),
@@ -187,35 +149,6 @@ class _JobDetailsState extends State<JobDetails> {
                               ),
                             ],
                           ),
-
-                          // Row(children: [
-                          //   GestureDetector(
-                          //     onTap: () {
-                          //       _makePhoneCall(job.phoneNumber.toString());
-                          //     },
-                          //     child: Image(
-                          //       image:
-                          //           const AssetImage("assets/images/phone.png"),
-                          //       height: SizeConstant.getHeightWithScreen(24),
-                          //       width: SizeConstant.getHeightWithScreen(24),
-                          //     ),
-                          //   ),
-                          //   SizedBox(
-                          //     width: SizeConstant.getHeightWithScreen(10),
-                          //   ),
-                          //   GestureDetector(
-                          //     onTap: () {
-                          //       _launchWhatsApp(job.phoneNumber.toString());
-                          //     },
-                          //     child: Image(
-                          //       image: const AssetImage(
-                          //         "assets/images/whatsapp.png",
-                          //       ),
-                          //       height: SizeConstant.getHeightWithScreen(24),
-                          //       width: SizeConstant.getHeightWithScreen(24),
-                          //     ),
-                          //   ),
-                          // ]),
                         ],
                       ),
                     ),
@@ -223,17 +156,15 @@ class _JobDetailsState extends State<JobDetails> {
                     Center(
                       child: CircleAvatar(
                         radius: 50.0,
-                        backgroundImage: widget.job.ownerProfileImage == null ||
-                                widget.job.ownerProfileImage.toString().isEmpty
+                        backgroundImage: imageUrl == null ||
+                                imageUrl.toString().isEmpty
                             ? null // No background image (we will show the icon instead)
-                            : isBase64(widget.job.ownerProfileImage)
-                                ? MemoryImage(base64Decode(widget
-                                    .job.ownerProfileImage
+                            : isBase64(imageUrl)
+                                ? MemoryImage(base64Decode(imageUrl
                                     .toString())) // If imageUrl is base64
-                                : NetworkImage(widget.job.ownerProfileImage
+                                : NetworkImage(imageUrl
                                     .toString()), // If imageUrl is a URL
-                        child: widget.job.ownerProfileImage == null ||
-                                widget.job.ownerProfileImage.toString().isEmpty
+                        child: imageUrl == null || imageUrl.toString().isEmpty
                             ? const Icon(Icons.person,
                                 size: 40,
                                 color: Colors
@@ -243,20 +174,20 @@ class _JobDetailsState extends State<JobDetails> {
                     ),
                     SizedBox(height: SizeConstant.getHeightWithScreen(20)),
                     // Text(
-                    //   'Flat No: ${widget.job.flatNo}',
+                    //   'Flat No: ${job.flatNo}',
                     //   style: const TextStyle(
                     //       fontSize: 18.0, fontWeight: FontWeight.bold),
                     // ),
+                    // Text(
+                    //   'Date: ${(job.date)}',
+                    //   style: const TextStyle(fontSize: 16.0),
+                    // ),
+                    // Text(
+                    //   'Type of Job: ${job.jobType}',
+                    //   style: const TextStyle(fontSize: 16.0),
+                    // ),
                     Text(
-                      'Expected Date: ${widget.job.date.toString()}',
-                      style: const TextStyle(fontSize: 16.0),
-                    ),
-                    Text(
-                      'Maid Type : ${jobTypeConvert(widget.job.jobType)}',
-                      style: const TextStyle(fontSize: 16.0),
-                    ),
-                    Text(
-                      'Owner Name: ${widget.job.ownerName}',
+                      'Full Name: ${name}',
                       style: const TextStyle(
                           fontSize: 16.0, fontStyle: FontStyle.italic),
                     ),
@@ -271,41 +202,17 @@ class _JobDetailsState extends State<JobDetails> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    InkWell(
-                      onTap: () {
-                        updateJobStatus(widget.job.id.toString(), "Deactive");
-                      },
-                      child: Container(
-                          width: (MediaQuery.of(context).size.width / 2) -
-                              SizeConstant.getHeightWithScreen(45),
-                          height: SizeConstant.getHeightWithScreen(40),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              width: 1,
-                              color: ColorConstant.primaryColor,
-                            ),
-                            borderRadius: BorderRadius.circular(
-                                SizeConstant.getHeightWithScreen(10)),
-                          ),
-                          child: Center(
-                            child: Text(
-                              "Deactive",
-                              style: TextStyle(
-                                fontSize: SizeConstant.mediumFont,
-                                fontWeight: FontWeight.w500,
-                                color: ColorConstant.primaryColor,
-                              ),
-                            ),
-                          )),
-                    ),
-                    SizedBox(
-                      width: SizeConstant.getHeightWithScreen(10),
-                    ),
                     VentasPrimaryButton(
                       onTap: () {
-                        updateJobStatus(widget.job.id.toString(), "Completed");
+                        storage.erase();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Logout Successfully!')),
+                        );
+                        Get.offAll(
+                          () => const Login(),
+                        );
                       },
-                      label: "Done",
+                      label: "Logout",
                       textColor: ColorConstant.white,
                       borderRadius: 10,
                       textSize: SizeConstant.mediumFont,

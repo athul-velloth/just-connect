@@ -9,7 +9,8 @@ class JobDetailsModel {
   final String jobStatus;
   final String? ownerProfileImage;
   final int? phoneNumber;
-
+  final String? title;
+  final String? description;
   JobDetailsModel({
     required this.id,
     required this.createdAt,
@@ -21,6 +22,8 @@ class JobDetailsModel {
     required this.jobStatus,
     this.ownerProfileImage,
     this.phoneNumber,
+    this.title,
+    this.description,
   });
 
   // Factory method to create a User instance from JSON
@@ -36,7 +39,8 @@ class JobDetailsModel {
       jobStatus: json['job_status'] as String,
       ownerProfileImage: json['owner_profile_image'] as String?,
       phoneNumber: json['phone_number'] as int,
-      
+      title: json['title'] as String?,
+      description: json['description'] as String?,
     );
   }
 
@@ -52,7 +56,9 @@ class JobDetailsModel {
       'job_type': jobType,
       'job_status': jobStatus,
       'owner_profile_image': ownerProfileImage,
-      'phone_number' : phoneNumber
+      'phone_number': phoneNumber,
+      'title': title,
+      'description': description
     };
   }
 }

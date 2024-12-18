@@ -3,7 +3,8 @@ import 'package:get/get.dart';
 import 'package:justconnect/model/Job.dart';
 
 class OwnerController extends GetxController {
-  final TextEditingController faltNoController = TextEditingController();
+  final TextEditingController titleController = TextEditingController();
+  final TextEditingController desController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
   final TextEditingController typeController = TextEditingController();
   final TextEditingController nameController = TextEditingController();

@@ -7,6 +7,7 @@ import 'package:justconnect/Ui/owner_dashboard/owner_dashboard.dart';
 import 'package:justconnect/Ui/signup.dart';
 import 'package:justconnect/constants/color_constants.dart';
 import 'package:justconnect/constants/size_constants.dart';
+import 'package:justconnect/widget/helper.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../widget/commontextInputfield.dart';
@@ -93,7 +94,7 @@ class _LoginState extends State<Login> {
                         try {
                           final email = emailController.text.trim();
                           final password = passwordController.text.trim();
-
+                          Helper.progressDialog(context, "Loading...");
                           // Sign in with Supabase
                           final response = await Supabase.instance.client
                               .from('user') // Replace with your table name
@@ -112,27 +113,33 @@ class _LoginState extends State<Login> {
                             final int id = response['id'];
                             final String signUpType = response['sign_up_type'];
                             final int phoneNumber = response['phone_number'];
-
+                            final String imageUrl = response['image_url'];
                             final String name = response['name'];
+                            final int flatNo = response['flat_no'];
+                            storage.write("ImageUrl", imageUrl.toString());
                             storage.write("Name", name.toString());
                             storage.write("UserId", id.toString());
                             storage.write("SignUpType", signUpType.toString());
+                            storage.write("FlatNo", flatNo.toString());
                             storage.write(
                                 "phone_number", phoneNumber.toString());
-
                             showDownloadSnackbar("Login successful");
+                            Helper.close();
                             if (signUpType == "Owner") {
                               Get.to(() => const OwnerDashboard());
                             } else {
                               Get.to(() => const Home());
                             }
                           } else {
+                            Helper.close();
                             showDownloadSnackbar("Login failed: No user found");
                           }
                         } on AuthException catch (e) {
+                          Helper.close();
                           // Handle Supabase-specific authentication errors
                           showDownloadSnackbar("Login failed: ${e.message}");
                         } catch (e) {
+                          Helper.close();
                           // Handle unexpected errors
                           showDownloadSnackbar("invalid Login details");
                         } finally {

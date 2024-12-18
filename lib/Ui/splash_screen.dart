@@ -24,7 +24,6 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   final storage = GetStorage();
-  String signUpType = "";
 
   @override
   void initState() {
@@ -34,22 +33,17 @@ class _SplashScreenState extends State<SplashScreen> {
 
   initApiCall() async {
     final storage = GetStorage();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final storedValue = storage.read('SignUpType');
-      print('SignUpType from storage: $storedValue'); // Debug
-      setState(() {
-        signUpType = storedValue ?? '';
-      });
-    });
     await checkUser();
   }
 
   Future<void> checkUser() async {
     Future.delayed(const Duration(seconds: 3), () {
-      if (signUpType.isEmpty || signUpType == null) {
+      final storedValue = storage.read('SignUpType') ?? "";
+      if (storedValue.isEmpty) {
         Get.to(() => const Login());
+        print("$storedValue");
       } else {
-        if (signUpType == "Owner") {
+        if (storedValue == "Owner") {
           Get.to(() => const OwnerDashboard());
         } else {
           Get.to(() => const Home());

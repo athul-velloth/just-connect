@@ -16,6 +16,7 @@ import 'package:justconnect/controller/owner_controller.dart';
 import 'package:justconnect/model/job_list.dart';
 import 'package:justconnect/widget/common_button.dart';
 import 'package:justconnect/widget/commontextInputfield.dart';
+import 'package:justconnect/widget/helper.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -34,6 +35,7 @@ class _CreateJobState extends State<CreateJob> {
   final storage = GetStorage();
   String ownerId = "";
   String ownerPhoneNumber = "";
+  String flatNo = "";
   String name = "";
   String imageUrl = "";
   File? _selfieImage; // To store the captured image
@@ -85,6 +87,7 @@ class _CreateJobState extends State<CreateJob> {
       fetchAllUsers();
       setState(() {
         name = storage.read('Name');
+        imageUrl = storage.read('ImageUrl') ?? "";
         _ownerController.nameController.text = name;
       });
     });
@@ -107,28 +110,28 @@ class _CreateJobState extends State<CreateJob> {
     });
   }
 
-  Future<void> _requestCameraPermission() async {
-    var status = await Permission.camera.status;
+  // Future<void> _requestCameraPermission() async {
+  //   var status = await Permission.camera.status;
 
-    if (status.isPermanentlyDenied) {
-      openAppSettings(); // This function navigates the user to app settings
-      return;
-    }
-    if (!status.isGranted) {
-      // Request the permission if not already granted
-      status = await Permission.camera.request();
-    }
+  //   if (status.isPermanentlyDenied) {
+  //     openAppSettings(); // This function navigates the user to app settings
+  //     return;
+  //   }
+  //   if (!status.isGranted) {
+  //     // Request the permission if not already granted
+  //     status = await Permission.camera.request();
+  //   }
 
-    if (status.isGranted) {
-      _takeSelfie(); // Call the function to capture an image if permission is granted
-    } else if (status.isDenied || status.isPermanentlyDenied) {
-      // Show a dialog or handle permission denial
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text("Camera permission is required to take selfies.")),
-      );
-    }
-  }
+  //   if (status.isGranted) {
+  //     _takeSelfie(); // Call the function to capture an image if permission is granted
+  //   } else if (status.isDenied || status.isPermanentlyDenied) {
+  //     // Show a dialog or handle permission denial
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(
+  //           content: Text("Camera permission is required to take selfies.")),
+  //     );
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -189,46 +192,64 @@ class _CreateJobState extends State<CreateJob> {
                 ],
               ),
             ),
-            SizedBox(height: SizeConstant.getHeightWithScreen(20)),
-            Container(
-              width: SizeConstant.getHeightWithScreen(80),
-              height: SizeConstant.getHeightWithScreen(80),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: ColorConstant.primaryColor,
-                  width: SizeConstant.getHeightWithScreen(1),
-                ),
-              ),
-              child: GestureDetector(
-                onTap: () {
-                  _requestCameraPermission();
-                },
-                child: CircleAvatar(
-                  radius: 50, // Size of the avatar
-                  backgroundImage: _selfieImage != null
-                      ? FileImage(_selfieImage!) // Display captured selfie
-                      : null,
-                  child: _selfieImage == null
-                      ? const Icon(
-                          Icons.camera_alt,
-                          size: 40,
-                          color: Colors.grey,
-                        )
-                      : null, // Show a camera icon if no selfie is taken
-                ),
-              ),
-            ),
+          //  SizedBox(height: SizeConstant.getHeightWithScreen(20)),
+            // Container(
+            //   width: SizeConstant.getHeightWithScreen(80),
+            //   height: SizeConstant.getHeightWithScreen(80),
+            //   decoration: BoxDecoration(
+            //     shape: BoxShape.circle,
+            //     border: Border.all(
+            //       color: ColorConstant.primaryColor,
+            //       width: SizeConstant.getHeightWithScreen(1),
+            //     ),
+            //   ),
+            //   child: GestureDetector(
+            //     onTap: () {
+            //      // _requestCameraPermission();
+            //     },
+            //     child: CircleAvatar(
+            //       radius: 50, // Size of the avatar
+            //       backgroundImage: _selfieImage != null
+            //           ? FileImage(_selfieImage!) // Display captured selfie
+            //           : null,
+            //       child: _selfieImage == null
+            //           ? const Icon(
+            //               Icons.camera_alt,
+            //               size: 40,
+            //               color: Colors.grey,
+            //             )
+            //           : null, // Show a camera icon if no selfie is taken
+            //     ),
+            //   ),
+            // ),
+           
             SizedBox(height: SizeConstant.getHeightWithScreen(20)),
             Padding(
               padding: EdgeInsets.symmetric(
                   horizontal: SizeConstant.horizontalPadding),
               child: CommonTextInputField(
-                textInputType: TextInputType.number,
+                textInputType: TextInputType.text,
                 showLabel: false,
                 height: SizeConstant.getHeightWithScreen(50),
-                controller: _ownerController.faltNoController,
-                hintText: "Enter Flat No.",
+                controller: _ownerController.titleController,
+                hintText: "Enter Title.",
+                isAteriskRequired: false,
+                enableInteractiveSelection: false,
+                onChanged: (p0) {
+                  setState(() {});
+                },
+              ),
+            ),
+            SizedBox(height: SizeConstant.getHeightWithScreen(10)),
+             Padding(
+              padding: EdgeInsets.symmetric(
+                  horizontal: SizeConstant.horizontalPadding),
+              child: CommonTextInputField(
+                textInputType: TextInputType.text,
+                showLabel: false,
+                height: SizeConstant.getHeightWithScreen(50),
+                controller: _ownerController.desController,
+                hintText: "Enter Description.",
                 isAteriskRequired: false,
                 enableInteractiveSelection: false,
                 onChanged: (p0) {
@@ -268,7 +289,7 @@ class _CreateJobState extends State<CreateJob> {
                       ),
                       decoration: InputDecoration(
                           border: InputBorder.none,
-                          labelText: "Date",
+                          labelText: "Expected Date",
                           suffixIcon: Icon(Icons.calendar_today_rounded,
                               color: ColorConstant.grey7,
                               size: SizeConstant.getHeightWithScreen(20)),
@@ -317,7 +338,7 @@ class _CreateJobState extends State<CreateJob> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                "Job Type",
+                                "Maid Type",
                                 style: TextStyle(
                                     fontSize: SizeConstant.mediumFont,
                                     color: ColorConstant.black6,
@@ -348,24 +369,24 @@ class _CreateJobState extends State<CreateJob> {
               ),
             ),
             SizedBox(height: SizeConstant.getHeightWithScreen(10)),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                  horizontal: SizeConstant.horizontalPadding),
-              child: CommonTextInputField(
-                textInputType: TextInputType.text,
-                showLabel: false,
-                isDisabled: true,
-                height: SizeConstant.getHeightWithScreen(50),
-                controller: _ownerController.nameController,
-                hintText: "Enter Name",
-                isAteriskRequired: false,
-                enableInteractiveSelection: false,
-                onChanged: (p0) {
-                  setState(() {});
-                },
-              ),
-            ),
-            SizedBox(height: SizeConstant.getHeightWithScreen(20)),
+            // Padding(
+            //   padding: EdgeInsets.symmetric(
+            //       horizontal: SizeConstant.horizontalPadding),
+            //   child: CommonTextInputField(
+            //     textInputType: TextInputType.text,
+            //     showLabel: false,
+            //     isDisabled: true,
+            //     height: SizeConstant.getHeightWithScreen(50),
+            //     controller: _ownerController.nameController,
+            //     hintText: "Enter Name",
+            //     isAteriskRequired: false,
+            //     enableInteractiveSelection: false,
+            //     onChanged: (p0) {
+            //       setState(() {});
+            //     },
+            //   ),
+            // ),
+           // SizedBox(height: SizeConstant.getHeightWithScreen(20)),
             Padding(
               padding: EdgeInsets.symmetric(
                   horizontal: SizeConstant.horizontalPadding),
@@ -375,46 +396,51 @@ class _CreateJobState extends State<CreateJob> {
                   onTap: () async {
                     ownerId = storage.read('UserId');
                     ownerPhoneNumber = storage.read('phone_number');
-                    if (_ownerController.faltNoController.text.trim().isEmpty ||
+                    flatNo = storage.read('FlatNo') ?? "";
+                    if (_ownerController.titleController.text.trim().isEmpty ||
+                        _ownerController.desController.text.trim().isEmpty ||
                         _ownerController.dateController.text.trim().isEmpty ||
                         jobResult.trim().isEmpty ||
-                        _ownerController.nameController.text.trim().isEmpty ||
                         imageUrl.isEmpty) {
                       showDownloadSnackbar("Please enter full details");
                     } else {
                       try {
+                        Helper.progressDialog(context, "Loading...");
                         // Sign in with Supabase
                         final response = await Supabase.instance.client
                             .from('job_create_list') // Your table name
                             .insert({
                           'owner_id': ownerId,
-                          'owner_name':
-                              _ownerController.nameController.text.trim(),
-                          'flat_no':
-                              _ownerController.faltNoController.text.trim(),
+                          'owner_name': _ownerController.nameController.text.trim(),
+                          'flat_no':   flatNo,
                           'date': _ownerController.dateController.text.trim(),
                           'job_type': jsonEncode(resultId),
                           'job_status': "Active",
                           'owner_profile_image': imageUrl.trim(),
                           'phone_number': ownerPhoneNumber,
+                          'title' : _ownerController.titleController.text.trim(),
+                          'description' : _ownerController.desController.text.trim()
                         }).select();
 
                         showDownloadSnackbar("Job Create successful");
                         _ownerController.nameController.clear();
                         _ownerController.typeController.clear();
                         _ownerController.dateController.clear();
-                        _ownerController.faltNoController.clear();
+                        _ownerController.titleController.clear();
+                        _ownerController.desController.clear();
                         setState(() {
                           jobResult = "";
                           resultId = [];
                           imageUrl = "";
                         });
-
-                         Get.off(() => const OwnerDashboard());
+                        Helper.close();
+                        Get.off(() => const OwnerDashboard());
                       } on AuthException catch (e) {
+                        Helper.close();
                         // Handle Supabase-specific authentication errors
                         showDownloadSnackbar("Login failed: ${e.message}");
                       } catch (e) {
+                        Helper.close();
                         // Handle unexpected errors
                         showDownloadSnackbar("Unexpected error: $e");
                         print("$e");

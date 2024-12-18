@@ -9,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:justconnect/Ui/login.dart';
 import 'package:justconnect/controller/login_controller.dart';
 import 'package:justconnect/model/job_list.dart';
+import 'package:justconnect/widget/helper.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../constants/color_constants.dart';
@@ -340,7 +341,7 @@ class _SignUpState extends State<SignUp> {
                                           MainAxisAlignment.center,
                                       children: [
                                         Text(
-                                          "Job Type",
+                                          "Maid Type",
                                           style: TextStyle(
                                               fontSize: SizeConstant.mediumFont,
                                               color: ColorConstant.black6,
@@ -446,6 +447,7 @@ class _SignUpState extends State<SignUp> {
                     } else {
                       try {
                         // Sign in with Supabase
+                        Helper.progressDialog(context, "Loading...");
                         final response = await Supabase.instance.client
                             .from('user') // Your table name
                             .insert({
@@ -479,15 +481,18 @@ class _SignUpState extends State<SignUp> {
                         _loginController.typeController.clear();
                         jobResult = "";
                         resultId = [];
+                        Helper.close();
                         Get.off(() => const Login());
                         //   Get.to(() => const Home());
                         // } else {
                         //   showDownloadSnackbar("Login failed: No user found");
                         // }
                       } on AuthException catch (e) {
+                        Helper.close();
                         // Handle Supabase-specific authentication errors
                         showDownloadSnackbar("Login failed: ${e.message}");
                       } catch (e) {
+                        Helper.close();
                         // Handle unexpected errors
                         showDownloadSnackbar("Unexpected error: $e");
                         print("$e");
@@ -587,7 +592,7 @@ class _JobSelectionModalState extends State<JobSelectionModal> {
                       margin:
                           const EdgeInsets.only(top: 0, left: 16, right: 10),
                       child: Text(
-                        "Job List",
+                        "Maid List",
                         style: TextStyle(
                           color: Colors.black,
                           fontFamily: "Outfit",
@@ -662,7 +667,8 @@ class _JobSelectionModalState extends State<JobSelectionModal> {
                                     if (value == true) {
                                       selectedItems.add(job.jobName); // Select
                                     } else {
-                                      selectedItems.remove(job.jobName); // Deselect
+                                      selectedItems
+                                          .remove(job.jobName); // Deselect
                                     }
                                   });
                                 },
@@ -685,8 +691,8 @@ class _JobSelectionModalState extends State<JobSelectionModal> {
                   ),
                 ),
                 const SizedBox(
-                        height: 60,
-                      )
+                  height: 60,
+                )
               ],
             ),
           ),

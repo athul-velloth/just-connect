@@ -4,15 +4,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:justconnect/Ui/job_detail_page.dart';
 import 'package:justconnect/Ui/owner_dashboard/owner_dashboard.dart';
+import 'package:justconnect/Ui/user_profile.dart';
 import 'package:justconnect/Ui/worker_dashboard/user_list.dart';
 import 'package:justconnect/constants/strings.dart';
 import 'package:justconnect/controller/worker_controller.dart';
 import 'package:justconnect/model/job_details_model.dart';
 import 'package:justconnect/model/job_list.dart';
 import 'package:justconnect/model/user_details.dart';
+import 'package:justconnect/widget/helper.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../constants/color_constants.dart';
@@ -30,16 +33,27 @@ class _HomeState extends State<Home> {
   List<JobDetailsModel> userList = [];
   List<String> resultId = [];
   String jobResult = "";
+  String imageUrl = "";
+  String name = "";
   List<JobList> jobList = [];
+  final storage = GetStorage();
   @override
   void initState() {
-    fetchAllUsers();
-    fetchAllJob();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      fetchAllUsers();
+      fetchAllJob();
+      setState(() {
+        name = storage.read('Name');
+        imageUrl = storage.read('ImageUrl') ?? "";
+      });
+    });
+
     super.initState();
   }
 
   Future<void> fetchAllUsers() async {
     try {
+      Helper.progressDialog(context, "Loading...");
       // final response = await Supabase.instance.client
       //     .from('job_create_list') // Replace 'users' with your table name
       //     .select()
@@ -60,6 +74,7 @@ class _HomeState extends State<Home> {
       }
       // Fe
       if (response.isNotEmpty) {
+        Helper.close();
         print('User List: $response');
         setState(() {
           userList = (response as List)
@@ -67,9 +82,14 @@ class _HomeState extends State<Home> {
               .toList();
         });
       } else {
+        setState(() {
+          userList.clear();
+        });
+        Helper.close();
         print('No users found.');
       }
     } catch (e) {
+      Helper.close();
       print('Error fetching user list: $e');
     }
   }
@@ -144,14 +164,42 @@ class _HomeState extends State<Home> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        Strings.workerDashboard,
-                        style: TextStyle(
-                          color: ColorConstant.black.withOpacity(0.88),
-                          fontSize: SizeConstant.largeFont,
-                          fontWeight: FontWeight.w600,
+                      Row(children: [
+                        GestureDetector(
+                          onTap: () {
+                            Get.to(() => const UserProfile());
+                          },
+                          child: CircleAvatar(
+                            radius: 20.0,
+                            backgroundImage: imageUrl == null ||
+                                    imageUrl.toString().isEmpty
+                                ? null // No background image (we will show the icon instead)
+                                : isBase64(imageUrl)
+                                    ? MemoryImage(base64Decode(imageUrl
+                                        .toString())) // If imageUrl is base64
+                                    : NetworkImage(imageUrl
+                                        .toString()), // If imageUrl is a URL
+                            child: imageUrl == null ||
+                                    imageUrl.toString().isEmpty
+                                ? const Icon(Icons.person,
+                                    size: 40,
+                                    color: Colors
+                                        .white) // Show person icon when image is missing
+                                : null, // Don't show icon if there's an image
+                          ),
                         ),
-                      ),
+                        SizedBox(
+                          width: SizeConstant.getHeightWithScreen(15),
+                        ),
+                        Text(
+                          name,
+                          style: TextStyle(
+                            color: ColorConstant.black.withOpacity(0.88),
+                            fontSize: SizeConstant.largeFont,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ]),
                       Row(
                         children: [
                           GestureDetector(
@@ -159,7 +207,7 @@ class _HomeState extends State<Home> {
                               _showModal(jobList);
                             },
                             child: Icon(
-                              Icons.filter_1_outlined,
+                              Icons.filter_list,
                               size: SizeConstant.getHeightWithScreen(26),
                               color: ColorConstant.black.withOpacity(0.88),
                             ),
@@ -172,7 +220,7 @@ class _HomeState extends State<Home> {
                               Get.to(() => const UserList());
                             },
                             child: Icon(
-                              Icons.exit_to_app,
+                              Icons.list_alt,
                               size: SizeConstant.getHeightWithScreen(26),
                               color: ColorConstant.black.withOpacity(0.88),
                             ),
@@ -351,16 +399,17 @@ class _HomeState extends State<Home> {
     if (result != null) {
       if (result.isEmpty) {
         setState(() {
-          fetchAllUsers();
           jobResult = "";
           resultId = [];
+          fetchAllUsers();
+        });
+      } else {
+        setState(() {
+          jobResult = result.toString();
+          resultId = result;
+          fetchAllUsers();
         });
       }
-      setState(() {
-        jobResult = result.toString();
-        resultId = result;
-        fetchAllUsers();
-      });
     }
   }
 }

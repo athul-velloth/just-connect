@@ -11,6 +11,7 @@ import 'package:justconnect/Ui/owner_dashboard/owner_dashboard.dart';
 import 'package:justconnect/constants/strings.dart';
 import 'package:justconnect/controller/worker_controller.dart';
 import 'package:justconnect/model/user_details.dart';
+import 'package:justconnect/widget/helper.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../constants/color_constants.dart';
@@ -42,6 +43,7 @@ class _HomeState extends State<UserList> {
 
   Future<void> fetchAllUsers(String signUpType) async {
     try {
+      Helper.progressDialog(context, "Loading...");
       final response = await Supabase.instance.client
           .from('user') // Replace 'users' with your table name
           .select()
@@ -52,6 +54,7 @@ class _HomeState extends State<UserList> {
                   : "Owner"); // Fetch all rows
 
       if (response.isNotEmpty) {
+        Helper.close();
         print('User List: $response');
         setState(() {
           userList = (response as List)
@@ -59,9 +62,11 @@ class _HomeState extends State<UserList> {
               .toList();
         });
       } else {
+        Helper.close();
         print('No users found.');
       }
     } catch (e) {
+      Helper.close();
       print('Error fetching user list: $e');
     }
   }
@@ -267,7 +272,10 @@ class _HomeState extends State<UserList> {
                                       ),
                                       signUpType == "Owner"
                                           ? Text(
-                                             job.jobType.isEmpty || job.jobType == [] ? "" :  jobTypeConvert(job.jobType),
+                                              job.jobType.isEmpty ||
+                                                      job.jobType == []
+                                                  ? ""
+                                                  : jobTypeConvert(job.jobType),
                                               style: TextStyle(
                                                 overflow: TextOverflow.visible,
                                                 fontSize:
