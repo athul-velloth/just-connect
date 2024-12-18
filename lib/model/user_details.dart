@@ -5,7 +5,7 @@ class UserDetails {
   final String password;
   final String name;
   final int phoneNumber;
-  final int flatNo;
+  final String? flatNo;
   final String jobType;
   final String signUpType;
   final String? imageUrl;
@@ -20,7 +20,7 @@ class UserDetails {
       required this.password,
       required this.name,
       required this.phoneNumber,
-      required this.flatNo,
+      this.flatNo,
       required this.jobType,
       required this.signUpType,
       this.imageUrl,
@@ -38,7 +38,7 @@ class UserDetails {
       password: json['password'] as String,
       name: json['name'] as String,
       phoneNumber: json['phone_number'] as int,
-      flatNo: json['flat_no'] as int,
+      flatNo: json['flat_no'] as String?,
       jobType: json['job_type'] as String,
       signUpType: json['sign_up_type'] as String,
       imageUrl: json['image_url'] as String?,

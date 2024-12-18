@@ -229,6 +229,8 @@ class _SignUpState extends State<SignUp> {
                           jobResult = "";
                           resultId = [];
                           imageUrl = "";
+                          startTime = null;
+                          endTime = null;
                           _selfieImage = null;
                         });
                       },
@@ -262,6 +264,8 @@ class _SignUpState extends State<SignUp> {
                           jobResult = "";
                           resultId = [];
                           imageUrl = "";
+                          startTime = null;
+                          endTime = null;
                           _selfieImage = null;
                         });
                       },
@@ -438,40 +442,46 @@ class _SignUpState extends State<SignUp> {
                             ),
                             SizedBox(
                                 height: SizeConstant.getHeightWithScreen(10)),
-                            TextField(
-                              keyboardType: TextInputType.number,
-                              controller: _loginController.timeController,
-                              decoration: InputDecoration(
-                                  hintText: "Enter time(from and to time)",
-                                  border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(18),
-                                      borderSide: BorderSide.none),
-                                  fillColor: Colors.purple.withOpacity(0.1),
-                                  filled: true,
-                                  prefixIcon: const Icon(Icons.timelapse)),
-                            )
+                            InkWell(
+                                onTap: () async {
+                                  timeRange = await showTimeRangePicker(
+                                    context: context,
+                                  );
+                                  print(
+                                      "result ${timeRange?.startTime} to${timeRange?.endTime}");
+                                  if (timeRange != null) {
+                                    setState(() {
+                                      startTime = timeRange?.startTime;
+                                      endTime = timeRange?.endTime;
+                                      _loginController.timeController.text =
+                                          "${formatTime(startTime)} ${formatTime(endTime)}";
+                                    });
+                                  }
+                                },
+                                child: Container(
+                                  width: SizeConstant.getHeightWithScreen(500),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal:
+                                          SizeConstant.getHeightWithScreen(17),
+                                      vertical:
+                                          SizeConstant.getHeightWithScreen(5)),
+                                  height: SizeConstant.getHeightWithScreen(55),
+                                  decoration: BoxDecoration(
+                                      color: Colors.purple.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(
+                                          SizeConstant.getHeightWithScreen(18)),
+                                      border: Border.all(
+                                          color: Colors.purple.withOpacity(0.1),
+                                          width:
+                                              SizeConstant.getHeightWithScreen(
+                                                  0.1))),
+                                  child: Text(
+                                    'Time Range \n${formatTime(startTime)} ${formatTime(endTime)}',
+                                  ),
+                                )),
                           ],
                         )
                       : const SizedBox(),
-                  SizedBox(height: SizeConstant.getHeightWithScreen(10)),
-                  _userType == "Owner"
-                      ? const SizedBox()
-                  : InkWell(
-                    onTap: () async {
-                      timeRange = await showTimeRangePicker(
-                        context: context,
-                      );
-                      print("result ${timeRange?.startTime} to${timeRange?.endTime}");
-                      if (timeRange != null) {
-                        setState(() {
-                          startTime = timeRange?.startTime;
-                          endTime = timeRange?.endTime;
-                        });
-                      }
-                    },
-                    child: Text('Time Range${formatTime(startTime)} ${formatTime(endTime)}',
-                    ),
-                  ),
                   SizedBox(height: SizeConstant.getHeightWithScreen(10)),
                   TextField(
                     controller: _loginController.passwordController,
@@ -569,7 +579,10 @@ class _SignUpState extends State<SignUp> {
                           'job_type': jsonEncode(resultId),
                           'sign_up_type': _userType.trim(),
                           'image_url': imageUrl,
-                          'uploaded_at': DateTime.now().toIso8601String()
+                          'uploaded_at': DateTime.now().toIso8601String(),
+                          'price' : _loginController.priceController.text.isEmpty ? "0" : _loginController.priceController.text.trim(),
+                          'city' : _loginController.cityController.text.trim(),
+                          'available_time' : _loginController.timeController.text.trim()
                         }).select();
                         // final response = await Supabase.instance.client.auth
                         //     .signUp(
@@ -594,6 +607,8 @@ class _SignUpState extends State<SignUp> {
                           jobResult = "";
                           resultId = [];
                           imageUrl = "";
+                          startTime = null;
+                          endTime = null;
                           _selfieImage = null;
                         });
 
@@ -607,6 +622,7 @@ class _SignUpState extends State<SignUp> {
                         Helper.close();
                         // Handle Supabase-specific authentication errors
                         showDownloadSnackbar("Login failed: ${e.message}");
+                         print("${e.message}");
                       } catch (e) {
                         Helper.close();
                         // Handle unexpected errors
@@ -647,10 +663,10 @@ class _SignUpState extends State<SignUp> {
   String formatTime(TimeOfDay? time) {
     if (time == null) return '';
     final now = DateTime.now();
-    final formattedTime = TimeOfDay(hour: time.hour, minute: time.minute).format(context);
+    final formattedTime =
+        TimeOfDay(hour: time.hour, minute: time.minute).format(context);
     return formattedTime;
   }
-
 
   _showModal(List<JobList> jobList) async {
     final result = await showModalBottomSheet<List<String>>(

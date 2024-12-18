@@ -270,16 +270,15 @@ class _HomeState extends State<UserList> {
                                           : const SizedBox(),
                                       signUpType == "Owner"
                                           ? Column(
-                                            crossAxisAlignment:  CrossAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 SizedBox(
                                                   height: SizeConstant
                                                       .getHeightWithScreen(2),
                                                 ),
                                                 Text(
-                                                  job.price == null
-                                                      ? "0"
-                                                      : job.price.toString(),
+                                                  "Price : ${job.price == null ? "0" : job.price.toString()}",
                                                   style: TextStyle(
                                                     overflow:
                                                         TextOverflow.ellipsis,
@@ -289,40 +288,44 @@ class _HomeState extends State<UserList> {
                                                     color: ColorConstant.grey26,
                                                   ),
                                                 ),
-                                                SizedBox(
-                                                  height: SizeConstant
-                                                      .getHeightWithScreen(4),
-                                                ),
-                                                Text(
-                                                  job.city.toString(),
-                                                  style: TextStyle(
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    fontSize:
-                                                        SizeConstant.xSmallFont,
-                                                    fontWeight: FontWeight.w500,
-                                                    color: ColorConstant.grey26,
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                  height: SizeConstant
-                                                      .getHeightWithScreen(4),
-                                                ),
-                                                Text(
-                                                  job.availableTime.toString(),
-                                                  style: TextStyle(
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    fontSize:
-                                                        SizeConstant.xSmallFont,
-                                                    fontWeight: FontWeight.w500,
-                                                    color: ColorConstant.grey26,
-                                                  ),
-                                                ),
+                                                Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Text(
+                                                        job.city.toString(),
+                                                        style: TextStyle(
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          fontSize: SizeConstant
+                                                              .xSmallFont,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color: ColorConstant
+                                                              .grey26,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        job.availableTime
+                                                            .toString(),
+                                                        style: TextStyle(
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          fontSize: SizeConstant
+                                                              .xSmallFont,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color: ColorConstant
+                                                              .grey26,
+                                                        ),
+                                                      ),
+                                                    ])
                                               ],
                                             )
                                           : Column(
-                                             crossAxisAlignment:  CrossAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 SizedBox(
                                                   height: SizeConstant

@@ -115,7 +115,7 @@ class _LoginState extends State<Login> {
                             final int phoneNumber = response['phone_number'];
                             final String imageUrl = response['image_url'];
                             final String name = response['name'];
-                            final int flatNo = response['flat_no'];
+                            final String flatNo = response['flat_no'];
                             storage.write("ImageUrl", imageUrl.toString());
                             storage.write("Name", name.toString());
                             storage.write("UserId", id.toString());

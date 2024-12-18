@@ -3,7 +3,7 @@ class JobDetailsModel {
   final String createdAt;
   final int ownerId;
   final String ownerName;
-  final int flatNo;
+  final String? flatNo;
   final String date;
   final String jobType;
   final String jobStatus;
@@ -16,7 +16,7 @@ class JobDetailsModel {
     required this.createdAt,
     required this.ownerId,
     required this.ownerName,
-    required this.flatNo,
+    this.flatNo,
     required this.date,
     required this.jobType,
     required this.jobStatus,
@@ -33,7 +33,7 @@ class JobDetailsModel {
       createdAt: json['created_at'] as String,
       ownerId: json['owner_id'] as int,
       ownerName: json['owner_name'] as String,
-      flatNo: json['flat_no'] as int,
+      flatNo: json['flat_no'] as String?,
       date: json['date'] as String,
       jobType: json['job_type'] as String,
       jobStatus: json['job_status'] as String,
