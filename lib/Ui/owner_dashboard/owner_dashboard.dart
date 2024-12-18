@@ -31,7 +31,7 @@ class OwnerDashboard extends StatefulWidget {
   State<OwnerDashboard> createState() => _OwnerDashboardState();
 }
 
-class _OwnerDashboardState extends State<OwnerDashboard> with RouteAware{
+class _OwnerDashboardState extends State<OwnerDashboard> with RouteAware {
   final OwnerController _ownerController = Get.put(OwnerController());
   List<JobDetailsModel> userList = [];
   List<String> resultId = [];
@@ -39,16 +39,18 @@ class _OwnerDashboardState extends State<OwnerDashboard> with RouteAware{
   List<JobList> jobList = [];
   String imageUrl = "";
   String name = "";
+  String UserId = "";
   final storage = GetStorage();
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      fetchAllUsers();
-      fetchAllJob();
       setState(() {
         name = storage.read('Name');
+        UserId = storage.read('UserId') ?? "";
         imageUrl = storage.read('ImageUrl') ?? "";
       });
+      fetchAllUsers();
+      fetchAllJob();
     });
     super.initState();
   }
@@ -78,12 +80,14 @@ class _OwnerDashboardState extends State<OwnerDashboard> with RouteAware{
             .from('job_create_list') // Replace 'users' with your table name
             .select()
             .eq('job_status', 'Active')
+            .eq('owner_id', UserId)
             .filter('job_type', 'eq', jsonEncode(resultId));
       } else {
         response = await Supabase.instance.client
             .from('job_create_list') // Replace 'users' with your table name
             .select()
-            .eq('job_status', 'Active');
+            .eq('job_status', 'Active')
+            .eq('owner_id', UserId);
       }
       // Fetch all rows
 

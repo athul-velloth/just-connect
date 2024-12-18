@@ -138,7 +138,7 @@ class JobCard extends StatelessWidget {
                   height: SizeConstant.getHeightWithScreen(5),
                 ),
                 Text(
-                  model.ownerName,
+                  model.title.toString(),
                   style: TextStyle(
                     overflow: TextOverflow.ellipsis,
                     fontSize: SizeConstant.mediumFont,

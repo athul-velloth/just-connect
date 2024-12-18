@@ -109,10 +109,7 @@ class _HomeState extends State<UserList> {
               ),
               // Wrap ListView.builder with Flexible or Expanded
               Padding(
-                padding: EdgeInsets.only(
-                    left: SizeConstant.horizontalPadding,
-                    top: SizeConstant.topPadding,
-                    right: SizeConstant.horizontalPadding),
+                padding: EdgeInsets.only(top: SizeConstant.topPadding),
                 child: Row(
                   children: [
                     GestureDetector(
@@ -278,7 +275,7 @@ class _HomeState extends State<UserList> {
                                                       .getHeightWithScreen(2),
                                                 ),
                                                 Text(
-                                                  "Price : ${job.price == null ? "0" : job.price.toString()}",
+                                                  "Price : ${job.price == null ? "0" : job.price.toString()} Rs/hr",
                                                   style: TextStyle(
                                                     overflow:
                                                         TextOverflow.ellipsis,
@@ -287,6 +284,10 @@ class _HomeState extends State<UserList> {
                                                     fontWeight: FontWeight.w500,
                                                     color: ColorConstant.grey26,
                                                   ),
+                                                ),
+                                                SizedBox(
+                                                  height: SizeConstant
+                                                      .getHeightWithScreen(4),
                                                 ),
                                                 Row(
                                                     mainAxisAlignment:
@@ -320,7 +321,75 @@ class _HomeState extends State<UserList> {
                                                               .grey26,
                                                         ),
                                                       ),
-                                                    ])
+                                                    ]),
+                                                SizedBox(
+                                                  height: SizeConstant
+                                                      .getHeightWithScreen(4),
+                                                ),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                      job.phoneNumber
+                                                          .toString(),
+                                                      style: TextStyle(
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        fontSize: SizeConstant
+                                                            .xSmallFont,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: ColorConstant
+                                                            .grey26,
+                                                      ),
+                                                    ),
+                                                    Row(children: [
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          _makePhoneCall(job
+                                                              .phoneNumber
+                                                              .toString());
+                                                        },
+                                                        child: Image(
+                                                          image: const AssetImage(
+                                                              "assets/images/phone.png"),
+                                                          height: SizeConstant
+                                                              .getHeightWithScreen(
+                                                                  24),
+                                                          width: SizeConstant
+                                                              .getHeightWithScreen(
+                                                                  24),
+                                                        ),
+                                                      ),
+                                                      SizedBox(
+                                                        width: SizeConstant
+                                                            .getHeightWithScreen(
+                                                                10),
+                                                      ),
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          _launchWhatsApp(job
+                                                              .phoneNumber
+                                                              .toString());
+                                                        },
+                                                        child: Image(
+                                                          image:
+                                                              const AssetImage(
+                                                            "assets/images/whatsapp.png",
+                                                          ),
+                                                          height: SizeConstant
+                                                              .getHeightWithScreen(
+                                                                  24),
+                                                          width: SizeConstant
+                                                              .getHeightWithScreen(
+                                                                  24),
+                                                        ),
+                                                      ),
+                                                    ]),
+                                                  ],
+                                                )
                                               ],
                                             )
                                           : Column(

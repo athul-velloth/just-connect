@@ -39,11 +39,9 @@ class _JobDetailsState extends State<JobDetails> {
     }
   }
 
-
-
   void _makePhoneCall(String number) async {
     String url = 'tel:$number';
-     try {
+    try {
       if (await canLaunch(url)) {
         await launch(url);
       } else {
@@ -93,8 +91,7 @@ class _JobDetailsState extends State<JobDetails> {
         print('Job status updated successfully: $response');
       } else {
         Helper.close();
-        showDownloadSnackbar(
-            "Error updating job status: ${response}");
+        showDownloadSnackbar("Error updating job status: ${response}");
         print('Error updating job status: ${response}');
       }
     } catch (e) {
@@ -252,11 +249,14 @@ class _JobDetailsState extends State<JobDetails> {
                       ),
                     ),
                     SizedBox(height: SizeConstant.getHeightWithScreen(20)),
-                    // Text(
-                    //   'Flat No: ${widget.job.flatNo}',
-                    //   style: const TextStyle(
-                    //       fontSize: 18.0, fontWeight: FontWeight.bold),
-                    // ),
+                    Text(
+                      'Title: ${widget.job.title}',
+                      style: const TextStyle(fontSize: 18.0),
+                    ),
+                    Text(
+                      'Description: ${widget.job.description}',
+                      style: const TextStyle(fontSize: 18.0),
+                    ),
                     Text(
                       'Expected Date: ${widget.job.date.toString()}',
                       style: const TextStyle(fontSize: 16.0),
@@ -275,54 +275,59 @@ class _JobDetailsState extends State<JobDetails> {
               ),
               Padding(
                 padding: EdgeInsets.symmetric(
-                  horizontal: SizeConstant.getHeightWithScreen(10),
+                  //  horizontal: SizeConstant.getHeightWithScreen(10),
                   vertical: SizeConstant.getHeightWithScreen(10),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    InkWell(
-                      onTap: () {
-                        updateJobStatus(widget.job.id.toString(), "Deactive");
-                      },
-                      child: Container(
-                          width: (MediaQuery.of(context).size.width / 2) -
-                              SizeConstant.getHeightWithScreen(45),
-                          height: SizeConstant.getHeightWithScreen(40),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              width: 1,
-                              color: ColorConstant.primaryColor,
-                            ),
-                            borderRadius: BorderRadius.circular(
-                                SizeConstant.getHeightWithScreen(10)),
-                          ),
-                          child: Center(
-                            child: Text(
-                              "Deactive",
-                              style: TextStyle(
-                                fontSize: SizeConstant.mediumFont,
-                                fontWeight: FontWeight.w500,
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {
+                          updateJobStatus(widget.job.id.toString(), "Deactive");
+                        },
+                        child: Container(
+                            width: (MediaQuery.of(context).size.width / 2) -
+                                SizeConstant.getHeightWithScreen(45),
+                            height: SizeConstant.getHeightWithScreen(40),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                width: 1,
                                 color: ColorConstant.primaryColor,
                               ),
+                              borderRadius: BorderRadius.circular(
+                                  SizeConstant.getHeightWithScreen(10)),
                             ),
-                          )),
+                            child: Center(
+                              child: Text(
+                                "Deactive",
+                                style: TextStyle(
+                                  fontSize: SizeConstant.mediumFont,
+                                  fontWeight: FontWeight.w500,
+                                  color: ColorConstant.primaryColor,
+                                ),
+                              ),
+                            )),
+                      ),
                     ),
                     SizedBox(
                       width: SizeConstant.getHeightWithScreen(10),
                     ),
-                    VentasPrimaryButton(
-                      onTap: () {
-                        updateJobStatus(widget.job.id.toString(), "Completed");
-                      },
-                      label: "Done",
-                      textColor: ColorConstant.white,
-                      borderRadius: 10,
-                      textSize: SizeConstant.mediumFont,
-                      weight: FontWeight.w500,
-                      btnHeight: SizeConstant.getHeightWithScreen(40),
-                      btnWidth: (MediaQuery.of(context).size.width / 2) -
-                          SizeConstant.getHeightWithScreen(45),
+                    Expanded(
+                      child: VentasPrimaryButton(
+                        onTap: () {
+                          updateJobStatus(
+                              widget.job.id.toString(), "Completed");
+                        },
+                        label: "Done",
+                        textColor: ColorConstant.white,
+                        borderRadius: 10,
+                        textSize: SizeConstant.mediumFont,
+                        weight: FontWeight.w500,
+                        btnHeight: SizeConstant.getHeightWithScreen(40),
+                        btnWidth: (MediaQuery.of(context).size.width / 2) -
+                            SizeConstant.getHeightWithScreen(45),
+                      ),
                     ),
                   ],
                 ),

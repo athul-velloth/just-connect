@@ -247,9 +247,16 @@ class _JobDetailPageState extends State<JobDetailPage> {
                     ),
                     SizedBox(height: SizeConstant.getHeightWithScreen(20)),
                     Text(
+                      'Title: ${widget.job.title}',
+                      style: const TextStyle(fontSize: 18.0),
+                    ),
+                    Text(
+                      'Description: ${widget.job.description}',
+                      style: const TextStyle(fontSize: 18.0),
+                    ),
+                    Text(
                       'Flat No: ${widget.job.flatNo}',
-                      style: const TextStyle(
-                          fontSize: 18.0, fontWeight: FontWeight.bold),
+                      style: const TextStyle(fontSize: 18.0),
                     ),
                     Text(
                       'Expected Date: ${(widget.job.date)}',
