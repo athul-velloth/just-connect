@@ -5,6 +5,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'Ui/splash_screen.dart';
 import 'constants/strings.dart';
 
+final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
+
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -25,6 +27,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: JustTheme().themeData,
       home: const SplashScreen(),
+      navigatorObservers: [routeObserver],
     );
   }
 }

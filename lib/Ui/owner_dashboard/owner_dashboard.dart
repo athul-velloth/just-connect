@@ -16,6 +16,7 @@ import 'package:justconnect/constants/color_constants.dart';
 import 'package:justconnect/constants/size_constants.dart';
 import 'package:justconnect/constants/strings.dart';
 import 'package:justconnect/controller/owner_controller.dart';
+import 'package:justconnect/main.dart';
 import 'package:justconnect/model/job_details_model.dart';
 import 'package:justconnect/model/job_list.dart';
 import 'package:justconnect/model/user_details.dart';
@@ -30,7 +31,7 @@ class OwnerDashboard extends StatefulWidget {
   State<OwnerDashboard> createState() => _OwnerDashboardState();
 }
 
-class _OwnerDashboardState extends State<OwnerDashboard> {
+class _OwnerDashboardState extends State<OwnerDashboard> with RouteAware{
   final OwnerController _ownerController = Get.put(OwnerController());
   List<JobDetailsModel> userList = [];
   List<String> resultId = [];
@@ -50,6 +51,22 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
       });
     });
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final ModalRoute<dynamic>? route = ModalRoute.of(context);
+    if (route is PageRoute) {
+      routeObserver.subscribe(this, route);
+    }
+  }
+
+  @override
+  void didPopNext() {
+    super.didPopNext();
+    fetchAllUsers();
+    fetchAllJob();
   }
 
   Future<void> fetchAllUsers() async {

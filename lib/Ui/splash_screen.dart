@@ -61,17 +61,14 @@ class _SplashScreenState extends State<SplashScreen> {
     );
     return SafeArea(
       child: Scaffold(
-        backgroundColor: ColorConstant.white,
-        body: InkWell(
-          onTap: () async {},
-          child: Center(
-            child: Text(
-              "Just Connect",
-              style: TextStyle(
-                color: ColorConstant.primaryColor,
-                fontSize: SizeConstant.largeXFont,
-                fontWeight: FontWeight.w500,
-              ),
+        backgroundColor: ColorConstant.primaryColor,
+        body: SizedBox(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          child: const Image(
+            fit: BoxFit.contain,
+            image: AssetImage(
+             "assets/images/splash_screen.png",
             ),
           ),
         ),
