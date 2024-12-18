@@ -5,11 +5,12 @@ import 'package:intl/intl.dart';
 import 'package:justconnect/constants/color_constants.dart';
 import 'package:justconnect/constants/size_constants.dart';
 import 'package:justconnect/model/Job.dart';
+import 'package:justconnect/model/job_details_model.dart';
 import 'package:justconnect/model/user_details.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class JobCard extends StatelessWidget {
-  final UserDetails model;
+  final JobDetailsModel model;
   const JobCard({
     super.key,
     required this.model,
@@ -52,6 +53,10 @@ class JobCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(children: [
       Container(
+        margin: EdgeInsets.only(
+          left: SizeConstant.getHeightWithScreen(15),
+          right: SizeConstant.getHeightWithScreen(15),
+        ),
         padding: EdgeInsets.only(
           left: SizeConstant.getHeightWithScreen(10),
           right: SizeConstant.getHeightWithScreen(12),
@@ -77,15 +82,16 @@ class JobCard extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 30.0,
-              backgroundImage: model.imageUrl == null ||
-                      model.imageUrl.toString().isEmpty
+              backgroundImage: model.ownerProfileImage == null ||
+                      model.ownerProfileImage.toString().isEmpty
                   ? null // No background image (we will show the icon instead)
-                  : isBase64(model.imageUrl)
-                      ? MemoryImage(base64Decode(
-                          model.imageUrl.toString())) // If imageUrl is base64
-                      : NetworkImage(
-                          model.imageUrl.toString()), // If imageUrl is a URL
-              child: model.imageUrl == null || model.imageUrl.toString().isEmpty
+                  : isBase64(model.ownerProfileImage)
+                      ? MemoryImage(base64Decode(model.ownerProfileImage
+                          .toString())) // If imageUrl is base64
+                      : NetworkImage(model.ownerProfileImage
+                          .toString()), // If imageUrl is a URL
+              child: model.ownerProfileImage == null ||
+                      model.ownerProfileImage.toString().isEmpty
                   ? const Icon(Icons.person,
                       size: 40,
                       color: Colors
@@ -103,7 +109,7 @@ class JobCard extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        dateConvert(model.createdAt.toString()),
+                        model.date.toString(),
                         style: TextStyle(
                           overflow: TextOverflow.ellipsis,
                           fontSize: SizeConstant.xSmallFont,
@@ -126,7 +132,7 @@ class JobCard extends StatelessWidget {
                   height: SizeConstant.getHeightWithScreen(5),
                 ),
                 Text(
-                  model.name,
+                  model.ownerName,
                   style: TextStyle(
                     overflow: TextOverflow.ellipsis,
                     fontSize: SizeConstant.mediumFont,

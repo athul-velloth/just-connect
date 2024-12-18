@@ -1,13 +1,22 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:justconnect/Ui/signup.dart';
 import 'package:justconnect/constants/color_constants.dart';
 import 'package:justconnect/constants/size_constants.dart';
 import 'package:justconnect/constants/strings.dart';
 import 'package:justconnect/controller/owner_controller.dart';
+import 'package:justconnect/model/job_list.dart';
 import 'package:justconnect/widget/common_button.dart';
 import 'package:justconnect/widget/commontextInputfield.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CreateJob extends StatefulWidget {
   final String ownerImage;
@@ -21,11 +30,103 @@ class CreateJob extends StatefulWidget {
 
 class _CreateJobState extends State<CreateJob> {
   final OwnerController _ownerController = Get.put(OwnerController());
+  final storage = GetStorage();
+  String ownerId = "";
+  String ownerPhoneNumber = "";
+  String name = "";
+  String imageUrl = "";
+  File? _selfieImage; // To store the captured image
+  final ImagePicker _picker = ImagePicker();
+  String resultId = "";
+  String jobResult = "";
+  List<JobList> jobList = [];
+  Future<void> _takeSelfie() async {
+    final XFile? image = await _picker.pickImage(
+      source: ImageSource.camera, // Use camera for selfie
+      preferredCameraDevice: CameraDevice.front, // Front camera for selfies
+    );
+    if (image != null) {
+      setState(() {
+        _selfieImage = File(image.path);
+      });
+      try {
+        List<int> imageBytes = await _selfieImage!.readAsBytes();
+        // Convert bytes to Base64 string
+        imageUrl = base64Encode(imageBytes); // Store the image file
+      } catch (e) {
+        debugPrint('Error converting image to Base64: $e');
+        return null;
+      }
+    }
+  }
+
+  Future<void> fetchAllUsers() async {
+    try {
+      final response =
+          await Supabase.instance.client.from('job_type_list').select();
+      if (response.isNotEmpty) {
+        print('User List: $response');
+        setState(() {
+          jobList =
+              (response as List).map((data) => JobList.fromJson(data)).toList();
+        });
+      } else {
+        print('No users found.');
+      }
+    } catch (e) {
+      print('Error fetching user list: $e');
+    }
+  }
 
   @override
   void initState() {
-    _ownerController.nameController.text = widget.ownerName;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      fetchAllUsers();
+      setState(() {
+        name = storage.read('Name');
+        _ownerController.nameController.text = name;
+      });
+    });
+
     super.initState();
+  }
+
+  Future<void> showDownloadSnackbar(String message) async {
+    Future.delayed(const Duration(milliseconds: 100), () {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            message,
+          ),
+          backgroundColor: Colors.black,
+          duration: const Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    });
+  }
+
+  Future<void> _requestCameraPermission() async {
+    var status = await Permission.camera.status;
+
+    if (status.isPermanentlyDenied) {
+      openAppSettings(); // This function navigates the user to app settings
+      return;
+    }
+    if (!status.isGranted) {
+      // Request the permission if not already granted
+      status = await Permission.camera.request();
+    }
+
+    if (status.isGranted) {
+      _takeSelfie(); // Call the function to capture an image if permission is granted
+    } else if (status.isDenied || status.isPermanentlyDenied) {
+      // Show a dialog or handle permission denial
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text("Camera permission is required to take selfies.")),
+      );
+    }
   }
 
   @override
@@ -98,12 +199,22 @@ class _CreateJobState extends State<CreateJob> {
                   width: SizeConstant.getHeightWithScreen(1),
                 ),
               ),
-              child: ClipOval(
-                child: Image.network(
-                  widget.ownerImage,
-                  fit: BoxFit.cover,
-                  width: SizeConstant.getHeightWithScreen(40),
-                  height: SizeConstant.getHeightWithScreen(40),
+              child: GestureDetector(
+                onTap: () {
+                  _requestCameraPermission();
+                },
+                child: CircleAvatar(
+                  radius: 50, // Size of the avatar
+                  backgroundImage: _selfieImage != null
+                      ? FileImage(_selfieImage!) // Display captured selfie
+                      : null,
+                  child: _selfieImage == null
+                      ? const Icon(
+                          Icons.camera_alt,
+                          size: 40,
+                          color: Colors.grey,
+                        )
+                      : null, // Show a camera icon if no selfie is taken
                 ),
               ),
             ),
@@ -174,17 +285,65 @@ class _CreateJobState extends State<CreateJob> {
             Padding(
               padding: EdgeInsets.symmetric(
                   horizontal: SizeConstant.horizontalPadding),
-              child: CommonTextInputField(
-                textInputType: TextInputType.text,
-                showLabel: false,
-                height: SizeConstant.getHeightWithScreen(50),
-                controller: _ownerController.typeController,
-                hintText: "Enter Type of Job",
-                isAteriskRequired: false,
-                enableInteractiveSelection: false,
-                onChanged: (p0) {
-                  setState(() {});
-                },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      _showModal(jobList);
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: SizeConstant.getHeightWithScreen(17)),
+                      height: SizeConstant.getHeightWithScreen(55),
+                      decoration: BoxDecoration(
+                          color: Colors.purple.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(
+                              SizeConstant.getHeightWithScreen(18)),
+                          border: Border.all(
+                              color: Colors.purple.withOpacity(0.1),
+                              width: SizeConstant.getHeightWithScreen(0.1))),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // Icon(
+                          //   Icons.work, // Replace with your desired icon
+                          //   size: SizeConstant.getHeightWithScreen(
+                          //       20), // Adjust icon size
+                          // ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Job Type",
+                                style: TextStyle(
+                                    fontSize: SizeConstant.mediumFont,
+                                    color: ColorConstant.black6,
+                                    fontFamily: "Poppins-Regular",
+                                    fontWeight: FontWeight.w300),
+                              ),
+                              Text(
+                                jobResult,
+                                style: TextStyle(
+                                    fontSize: SizeConstant.smallFont,
+                                    color: ColorConstant.black3,
+                                    fontFamily: "Poppins-Medium",
+                                    fontWeight: FontWeight.w500),
+                              ),
+                            ],
+                          ),
+                          Icon(
+                            Icons.arrow_drop_down, // Use a down arrow icon
+                            size: SizeConstant.getHeightWithScreen(
+                                16), // Set size dynamically
+                            color: Colors.black, // Optional: Set color
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             SizedBox(height: SizeConstant.getHeightWithScreen(10)),
@@ -212,11 +371,58 @@ class _CreateJobState extends State<CreateJob> {
               child: CommonButton(
                   bgColor: ColorConstant.outletButtonColor,
                   btnHeight: SizeConstant.getHeightWithScreen(48),
-                  onTap: () {
-                    if (_ownerController.faltNoController.text.isNotEmpty &&
-                        _ownerController.dateController.text.isNotEmpty &&
-                        _ownerController.typeController.text.isNotEmpty &&
-                        _ownerController.nameController.text.isNotEmpty) {}
+                  onTap: () async {
+                    ownerId = storage.read('UserId');
+                    ownerPhoneNumber = storage.read('phone_number');
+                    if (_ownerController.faltNoController.text.trim().isEmpty ||
+                        _ownerController.dateController.text.trim().isEmpty ||
+                        jobResult.trim().isEmpty ||
+                        _ownerController.nameController.text.trim().isEmpty ||
+                        imageUrl.isEmpty) {
+                      showDownloadSnackbar("Please enter full details");
+                    } else {
+                      try {
+                        // Sign in with Supabase
+                        final response = await Supabase.instance.client
+                            .from('job_create_list') // Your table name
+                            .insert({
+                          'owner_id': ownerId,
+                          'owner_name':
+                              _ownerController.nameController.text.trim(),
+                          'flat_no':
+                              _ownerController.faltNoController.text.trim(),
+                          'date': _ownerController.dateController.text.trim(),
+                          'job_type':
+                              jobResult,
+                          'job_status': "Active",
+                          'owner_profile_image': imageUrl.trim(),
+                          'phone_number': ownerPhoneNumber,
+                        }).select();
+
+                        showDownloadSnackbar("Job Create successful");
+                        _ownerController.nameController.clear();
+                        _ownerController.typeController.clear();
+                        _ownerController.dateController.clear();
+                        _ownerController.faltNoController.clear();
+                        setState(() {
+                          jobResult = "";
+                          resultId = "";
+                          imageUrl = "";
+                        });
+                      } on AuthException catch (e) {
+                        // Handle Supabase-specific authentication errors
+                        showDownloadSnackbar("Login failed: ${e.message}");
+                      } catch (e) {
+                        // Handle unexpected errors
+                        showDownloadSnackbar("Unexpected error: $e");
+                        print("$e");
+                      } finally {
+                        setState(() {
+                          //_loading = false; // Reset loading state
+                        });
+                      }
+                    }
+
                     // String pattern =
                     //     r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
                     // RegExp regex = RegExp(pattern);
@@ -230,6 +436,22 @@ class _CreateJobState extends State<CreateJob> {
         ),
       ),
     );
+  }
+
+  _showModal(List<JobList> jobList) async {
+    final result = await showModalBottomSheet<String>(
+        context: context,
+        isScrollControlled: true,
+        isDismissible: false,
+        builder: (context) =>
+            JobSelectionModal(jobList: jobList, resultId: resultId));
+    if (result != null) {
+      int index = int.parse(result);
+      setState(() {
+        jobResult = jobList[index].jobName ?? "";
+        resultId = jobList[index].id.toString() ?? "";
+      });
+    }
   }
 
   Future<void> selectDate(

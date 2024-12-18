@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:justconnect/Ui/owner_dashboard/owner_dashboard.dart';
 import 'package:justconnect/Ui/signup.dart';
 import 'package:justconnect/constants/color_constants.dart';
@@ -21,6 +22,7 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final storage = GetStorage();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,7 +45,7 @@ class _LoginState extends State<Login> {
                           borderSide: BorderSide.none),
                       fillColor: Colors.purple.withOpacity(0.1),
                       filled: true,
-                      prefixIcon: const Icon(Icons.person)),
+                      prefixIcon: const Icon(Icons.email)),
                 ),
                 SizedBox(height: SizeConstant.getHeightWithScreen(10)),
                 TextField(
@@ -107,8 +109,22 @@ class _LoginState extends State<Login> {
 
                           // Check for successful sign-in
                           if (response != null) {
+                            final int id = response['id'];
+                            final String signUpType = response['sign_up_type'];
+                            final int phoneNumber = response['phone_number'];
+
+                            final String name = response['name'];
+                            storage.write("Name", name.toString());
+                            storage.write("UserId", id.toString());
+                            storage.write(
+                                "phone_number", phoneNumber.toString());
+
                             showDownloadSnackbar("Login successful");
-                            Get.to(() => const Home());
+                            if (signUpType == "Owner") {
+                              Get.to(() => const OwnerDashboard());
+                            } else {
+                              Get.to(() => const Home());
+                            }
                           } else {
                             showDownloadSnackbar("Login failed: No user found");
                           }

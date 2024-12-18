@@ -6,12 +6,13 @@ import 'package:justconnect/constants/color_constants.dart';
 import 'package:justconnect/constants/size_constants.dart';
 import 'package:justconnect/constants/strings.dart';
 import 'package:justconnect/model/Job.dart';
+import 'package:justconnect/model/job_details_model.dart';
 import 'package:justconnect/model/user_details.dart';
 import 'package:justconnect/widget/ventas_primary_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class JobDetailPage extends StatelessWidget {
-  final UserDetails job;
+  final JobDetailsModel job;
 
   const JobDetailPage({Key? key, required this.job}) : super(key: key);
 
@@ -159,16 +160,16 @@ class JobDetailPage extends StatelessWidget {
                     Center(
                       child: CircleAvatar(
                         radius: 50.0,
-                        backgroundImage: job.imageUrl == null ||
-                                job.imageUrl.toString().isEmpty
+                        backgroundImage: job.ownerProfileImage == null ||
+                                job.ownerProfileImage.toString().isEmpty
                             ? null // No background image (we will show the icon instead)
-                            : isBase64(job.imageUrl)
-                                ? MemoryImage(base64Decode(job.imageUrl
+                            : isBase64(job.ownerProfileImage)
+                                ? MemoryImage(base64Decode(job.ownerProfileImage
                                     .toString())) // If imageUrl is base64
-                                : NetworkImage(job.imageUrl
+                                : NetworkImage(job.ownerProfileImage
                                     .toString()), // If imageUrl is a URL
-                        child: job.imageUrl == null ||
-                                job.imageUrl.toString().isEmpty
+                        child: job.ownerProfileImage == null ||
+                                job.ownerProfileImage.toString().isEmpty
                             ? const Icon(Icons.person,
                                 size: 40,
                                 color: Colors
@@ -183,7 +184,7 @@ class JobDetailPage extends StatelessWidget {
                           fontSize: 18.0, fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      'Date: ${dateConvert(job.createdAt)}',
+                      'Date: ${(job.date)}',
                       style: const TextStyle(fontSize: 16.0),
                     ),
                     Text(
@@ -191,7 +192,7 @@ class JobDetailPage extends StatelessWidget {
                       style: const TextStyle(fontSize: 16.0),
                     ),
                     Text(
-                      'Full Name: ${job.name}',
+                      'Full Name: ${job.ownerName}',
                       style: const TextStyle(
                           fontSize: 16.0, fontStyle: FontStyle.italic),
                     ),

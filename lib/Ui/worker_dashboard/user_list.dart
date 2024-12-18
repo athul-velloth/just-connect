@@ -4,48 +4,53 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:justconnect/Ui/job_detail_page.dart';
 import 'package:justconnect/Ui/owner_dashboard/owner_dashboard.dart';
-import 'package:justconnect/Ui/worker_dashboard/user_list.dart';
 import 'package:justconnect/constants/strings.dart';
 import 'package:justconnect/controller/worker_controller.dart';
-import 'package:justconnect/model/job_details_model.dart';
 import 'package:justconnect/model/user_details.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../constants/color_constants.dart';
 import '../../constants/size_constants.dart';
 
-class Home extends StatefulWidget {
-  const Home({super.key});
+class UserList extends StatefulWidget {
+  const UserList({super.key});
 
   @override
-  State<Home> createState() => _HomeState();
+  State<UserList> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<UserList> {
   final WorkerController _ownerController = Get.put(WorkerController());
-  List<JobDetailsModel> userList = [];
+  List<UserDetails> userList = [];
+  final storage = GetStorage();
   @override
   void initState() {
-    fetchAllUsers();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        String signUpType = storage.read('SignUpType');
+        fetchAllUsers(signUpType);
+      });
+    });
+
     super.initState();
   }
 
-  Future<void> fetchAllUsers() async {
+  Future<void> fetchAllUsers(String signUpType) async {
     try {
       final response = await Supabase.instance.client
-          .from('job_create_list') // Replace 'users' with your table name
+          .from('user') // Replace 'users' with your table name
           .select()
-          .eq('job_status', 'Active'); // Fetch all rows
-// Fetch all rows
+          .eq('sign_up_type', signUpType.toString() == "Owner" ? "Maid" : "Owner"); // Fetch all rows
 
       if (response.isNotEmpty) {
         print('User List: $response');
         setState(() {
           userList = (response as List)
-              .map((data) => JobDetailsModel.fromJson(data))
+              .map((data) => UserDetails.fromJson(data))
               .toList();
         });
       } else {
@@ -98,24 +103,42 @@ class _HomeState extends State<Home> {
                     top: SizeConstant.topPadding,
                     right: SizeConstant.horizontalPadding),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      Strings.workerDashboard,
-                      style: TextStyle(
-                        color: ColorConstant.black.withOpacity(0.88),
-                        fontSize: SizeConstant.largeFont,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
                     GestureDetector(
                       onTap: () {
-                        Get.to(() => const UserList());
+                        Navigator.of(context).pop();
                       },
-                      child: Icon(
-                        Icons.exit_to_app,
-                        size: SizeConstant.getHeightWithScreen(26),
-                        color: ColorConstant.black.withOpacity(0.88),
+                      child: Container(
+                        height: SizeConstant.getHeightWithScreen(35),
+                        width: SizeConstant.getHeightWithScreen(35),
+                        padding: EdgeInsets.only(
+                            left: SizeConstant.getHeightWithScreen(12),
+                            bottom: SizeConstant.getHeightWithScreen(10),
+                            right: SizeConstant.getHeightWithScreen(9),
+                            top: SizeConstant.getHeightWithScreen(9)),
+                        decoration: BoxDecoration(
+                          color: ColorConstant.vibBgColor,
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(10),
+                          ),
+                        ),
+                        child: Icon(
+                          Icons.arrow_back_ios,
+                          color: ColorConstant.black,
+                          size: SizeConstant.getHeightWithScreen(16),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(
+                          left: SizeConstant.getHeightWithScreen(15)),
+                      child: Text(
+                        Strings.userDetails,
+                        style: TextStyle(
+                          color: ColorConstant.black.withOpacity(0.88),
+                          fontSize: SizeConstant.largeFont,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ],
@@ -129,12 +152,12 @@ class _HomeState extends State<Home> {
                           final job = userList[index];
                           return GestureDetector(
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => JobDetailPage(job: job),
-                                ),
-                              );
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (context) => JobDetailPage(job: job),
+                              //   ),
+                              // );
                             },
                             child: Container(
                               margin: EdgeInsets.only(
@@ -168,22 +191,17 @@ class _HomeState extends State<Home> {
                                 children: [
                                   CircleAvatar(
                                     radius: 30.0,
-                                    backgroundImage: job.ownerProfileImage ==
-                                                null ||
-                                            job.ownerProfileImage
-                                                .toString()
-                                                .isEmpty
+                                    backgroundImage: job.imageUrl == null ||
+                                            job.imageUrl.toString().isEmpty
                                         ? null // No background image (we will show the icon instead)
-                                        : isBase64(job.ownerProfileImage)
+                                        : isBase64(job.imageUrl)
                                             ? MemoryImage(base64Decode(job
-                                                .ownerProfileImage
+                                                .imageUrl
                                                 .toString())) // If imageUrl is base64
-                                            : NetworkImage(job.ownerProfileImage
+                                            : NetworkImage(job.imageUrl
                                                 .toString()), // If imageUrl is a URL
-                                    child: job.ownerProfileImage == null ||
-                                            job.ownerProfileImage
-                                                .toString()
-                                                .isEmpty
+                                    child: job.imageUrl == null ||
+                                            job.imageUrl.toString().isEmpty
                                         ? const Icon(Icons.person,
                                             size: 40,
                                             color: Colors
@@ -202,7 +220,8 @@ class _HomeState extends State<Home> {
                                         children: [
                                           Expanded(
                                             child: Text(
-                                              job.date.toString(),
+                                              dateConvert(
+                                                  job.createdAt.toString()),
                                               style: TextStyle(
                                                 overflow: TextOverflow.ellipsis,
                                                 fontSize:
@@ -216,12 +235,12 @@ class _HomeState extends State<Home> {
                                             width: SizeConstant
                                                 .getHeightWithScreen(5),
                                           ),
-                                          Icon(
-                                            Icons.arrow_forward_ios,
-                                            color: ColorConstant.primaryColor,
-                                            size: SizeConstant
-                                                .getHeightWithScreen(12),
-                                          ),
+                                          // Icon(
+                                          //   Icons.arrow_forward_ios,
+                                          //   color: ColorConstant.primaryColor,
+                                          //   size: SizeConstant
+                                          //       .getHeightWithScreen(12),
+                                          // ),
                                         ],
                                       ),
                                       SizedBox(
@@ -229,7 +248,7 @@ class _HomeState extends State<Home> {
                                             SizeConstant.getHeightWithScreen(5),
                                       ),
                                       Text(
-                                        job.ownerName,
+                                        job.name,
                                         style: TextStyle(
                                           overflow: TextOverflow.ellipsis,
                                           fontSize: SizeConstant.mediumFont,
@@ -238,8 +257,7 @@ class _HomeState extends State<Home> {
                                         ),
                                       ),
                                       SizedBox(
-                                        height:
-                                            SizeConstant.getHeightWithScreen(4),
+                                        height: SizeConstant.getHeightWithScreen(4),
                                       ),
                                       Text(
                                         job.jobType,

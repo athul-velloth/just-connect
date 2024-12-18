@@ -8,6 +8,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:justconnect/Ui/login.dart';
 import 'package:justconnect/controller/login_controller.dart';
+import 'package:justconnect/model/job_list.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../constants/color_constants.dart';
@@ -28,24 +29,53 @@ class _SignUpState extends State<SignUp> {
   File? _selfieImage; // To store the captured image
   final ImagePicker _picker = ImagePicker();
   String imageUrl = "";
+  String resultId = "";
+  String jobResult = "";
+  List<JobList> jobList = [];
+
+  @override
+  void initState() {
+    fetchAllUsers();
+    super.initState();
+  }
+
   Future<void> _takeSelfie() async {
     final XFile? image = await _picker.pickImage(
       source: ImageSource.camera, // Use camera for selfie
       preferredCameraDevice: CameraDevice.front, // Front camera for selfies
     );
     if (image != null) {
-      setState(() async {
+      setState(() {
         _selfieImage = File(image.path);
-        try {
-          List<int> imageBytes = await _selfieImage!.readAsBytes();
-          // Convert bytes to Base64 string
-          imageUrl = base64Encode(imageBytes);
-          _uploadImage(_selfieImage); // Store the image file
-        } catch (e) {
-          debugPrint('Error converting image to Base64: $e');
-          return null;
-        }
       });
+
+      try {
+        List<int> imageBytes = await _selfieImage!.readAsBytes();
+        // Convert bytes to Base64 string
+        imageUrl = base64Encode(imageBytes);
+        // _uploadImage(_selfieImage); // Store the image file
+      } catch (e) {
+        debugPrint('Error converting image to Base64: $e');
+        return null;
+      }
+    }
+  }
+
+  Future<void> fetchAllUsers() async {
+    try {
+      final response =
+          await Supabase.instance.client.from('job_type_list').select();
+      if (response.isNotEmpty) {
+        print('User List: $response');
+        setState(() {
+          jobList =
+              (response as List).map((data) => JobList.fromJson(data)).toList();
+        });
+      } else {
+        print('No users found.');
+      }
+    } catch (e) {
+      print('Error fetching user list: $e');
     }
   }
 
@@ -182,6 +212,8 @@ class _SignUpState extends State<SignUp> {
                         setState(() {
                           _userType = 'Owner';
                           _loginController.typeController.clear();
+                          resultId = "";
+                          jobResult = "";
                         });
                       },
                       style: ElevatedButton.styleFrom(
@@ -252,7 +284,7 @@ class _SignUpState extends State<SignUp> {
                             borderSide: BorderSide.none),
                         fillColor: Colors.purple.withOpacity(0.1),
                         filled: true,
-                        prefixIcon: const Icon(Icons.email)),
+                        prefixIcon: const Icon(Icons.phone)),
                   ),
                   SizedBox(height: SizeConstant.getHeightWithScreen(10)),
                   TextField(
@@ -264,24 +296,83 @@ class _SignUpState extends State<SignUp> {
                             borderSide: BorderSide.none),
                         fillColor: Colors.purple.withOpacity(0.1),
                         filled: true,
-                        prefixIcon: const Icon(Icons.email)),
+                        prefixIcon: const Icon(Icons.home)),
                   ),
                   SizedBox(
                       height: SizeConstant.getHeightWithScreen(
                           _userType == "Owner" ? 0 : 10)),
                   _userType == "Owner"
                       ? const SizedBox()
-                      : TextField(
-                          controller: _loginController.typeController,
-                          decoration: InputDecoration(
-                              hintText: "Enter Type of Job.",
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(18),
-                                  borderSide: BorderSide.none),
-                              fillColor: Colors.purple.withOpacity(0.1),
-                              filled: true,
-                              prefixIcon: const Icon(Icons.email)),
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                _showModal(jobList);
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal:
+                                        SizeConstant.getHeightWithScreen(17)),
+                                height: SizeConstant.getHeightWithScreen(55),
+                                decoration: BoxDecoration(
+                                    color: Colors.purple.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(
+                                        SizeConstant.getHeightWithScreen(18)),
+                                    border: Border.all(
+                                        color: Colors.purple.withOpacity(0.1),
+                                        width: SizeConstant.getHeightWithScreen(
+                                            0.1))),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    // Icon(
+                                    //   Icons
+                                    //       .work, // Replace with your desired icon
+                                    //   size: SizeConstant.getHeightWithScreen(
+                                    //       20), // Adjust icon size
+                                    // ),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          "Job Type",
+                                          style: TextStyle(
+                                              fontSize: SizeConstant.mediumFont,
+                                              color: ColorConstant.black6,
+                                              fontFamily: "Poppins-Regular",
+                                              fontWeight: FontWeight.w300),
+                                        ),
+                                        Text(
+                                          jobResult,
+                                          style: TextStyle(
+                                              fontSize: SizeConstant.smallFont,
+                                              color: ColorConstant.black3,
+                                              fontFamily: "Poppins-Medium",
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                      ],
+                                    ),
+                                    Icon(
+                                      Icons
+                                          .arrow_drop_down, // Use a down arrow icon
+                                      size: SizeConstant.getHeightWithScreen(
+                                          16), // Set size dynamically
+                                      color:
+                                          Colors.black, // Optional: Set color
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
+                
+                
                   SizedBox(height: SizeConstant.getHeightWithScreen(10)),
                   TextField(
                     controller: _loginController.passwordController,
@@ -334,14 +425,14 @@ class _SignUpState extends State<SignUp> {
                     } else if (_loginController.mobileNoController.text
                             .trim()
                             .length <
-                        9) {
+                        10) {
                       showDownloadSnackbar("Please enter the valid number");
                     } else if (_loginController.faltNoController.text
                         .trim()
                         .isEmpty) {
                       showDownloadSnackbar("Please enter the flat no");
                     } else if (_userType == "Maid" &&
-                        _loginController.typeController.text.trim().isEmpty) {
+                        jobResult.trim().isEmpty) {
                       showDownloadSnackbar("Please enter the job type");
                     } else if (_loginController.passwordController.text
                         .trim()
@@ -367,8 +458,7 @@ class _SignUpState extends State<SignUp> {
                               _loginController.mobileNoController.text.trim(),
                           'flat_no':
                               _loginController.faltNoController.text.trim(),
-                          'job_type':
-                              _loginController.typeController.text.trim(),
+                          'job_type': jobResult,
                           'sign_up_type': _userType.trim(),
                           'image_url': imageUrl,
                           'uploaded_at': DateTime.now().toIso8601String()
@@ -389,6 +479,8 @@ class _SignUpState extends State<SignUp> {
                         _loginController.passwordController.clear();
                         _loginController.confirmPasswordController.clear();
                         _loginController.typeController.clear();
+                        jobResult = "";
+                        resultId = "";
                         Get.off(() => const Login());
                         //   Get.to(() => const Home());
                         // } else {
@@ -431,5 +523,164 @@ class _SignUpState extends State<SignUp> {
         ),
       ),
     );
+  }
+
+  _showModal(List<JobList> jobList) async {
+    final result = await showModalBottomSheet<String>(
+        context: context,
+        isScrollControlled: true,
+        isDismissible: false,
+        builder: (context) =>
+            JobSelectionModal(jobList: jobList, resultId: resultId));
+    if (result != null) {
+      int index = int.parse(result);
+      setState(() {
+        jobResult = jobList[index].jobName ?? "";
+        resultId = jobList[index].id.toString() ?? "";
+      });
+    }
+  }
+}
+
+class JobSelectionModal extends StatefulWidget {
+  final List<JobList> jobList;
+  final String resultId;
+
+  const JobSelectionModal(
+      {super.key, required this.jobList, required this.resultId});
+
+  @override
+  State<JobSelectionModal> createState() => _JobSelectionModalState();
+}
+
+class _JobSelectionModalState extends State<JobSelectionModal> {
+  String selectedRadioValue = 'any'.tr;
+  String selectedNumber = "";
+  @override
+  void initState() {
+    selectedRadioValue = widget.resultId;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(children: [
+      SingleChildScrollView(
+          child: Container(
+        padding: EdgeInsets.only(top: SizeConstant.getHeightWithScreen(50)),
+        color: const Color(0xff757575),
+        child: Container(
+            padding: EdgeInsets.only(top: SizeConstant.getHeightWithScreen(5)),
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                    topLeft:
+                        Radius.circular(SizeConstant.getHeightWithScreen(30)),
+                    topRight:
+                        Radius.circular(SizeConstant.getHeightWithScreen(30)))),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                const SizedBox(height: 5.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      margin:
+                          const EdgeInsets.only(top: 0, left: 16, right: 10),
+                      child: Text(
+                        "Job List",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontFamily: "Outfit",
+                            fontWeight: FontWeight.w600,
+                            fontSize: SizeConstant.mediumFont),
+                      ),
+                    ),
+                    IconButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        icon: Icon(
+                          Icons.close,
+                          color: ColorConstant.grey2,
+                          size: SizeConstant.getHeightWithScreen(25),
+                        ))
+                  ],
+                ),
+                Container(
+                  margin: const EdgeInsets.only(top: 0, bottom: 27),
+                  child: ListView.builder(
+                    padding: EdgeInsets.zero,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: widget.jobList.length,
+                    itemBuilder: (context, index) => GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context, index.toString());
+                      },
+                      child: Container(
+                        margin: EdgeInsets.only(
+                            top: SizeConstant.getHeightWithScreen(10),
+                            left: SizeConstant.getHeightWithScreen(15),
+                            right: SizeConstant.getHeightWithScreen(15)),
+                        padding: EdgeInsets.only(
+                            left: SizeConstant.getHeightWithScreen(16),
+                            right: SizeConstant.getHeightWithScreen(16),
+                            top: SizeConstant.getHeightWithScreen(16),
+                            bottom: SizeConstant.getHeightWithScreen(14)),
+                        decoration: BoxDecoration(
+                            color:
+                                selectedRadioValue == widget.jobList[index].id
+                                    ? ColorConstant.orange4
+                                    : ColorConstant.white,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                                width: SizeConstant.getHeightWithScreen(1),
+                                color: selectedRadioValue ==
+                                        widget.jobList[index].id
+                                    ? ColorConstant.white
+                                    : ColorConstant.vibBgColor)),
+                        child: Row(
+                          children: [
+                            Radio(
+                              value: widget.jobList[index].id,
+                              groupValue: selectedRadioValue,
+                              materialTapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap,
+                              onChanged: (value) {
+                                setState(() {
+                                  Navigator.pop(context, index.toString());
+                                });
+                              },
+                              fillColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.selected)) {
+                                  return ColorConstant.primaryColor;
+                                }
+                                return ColorConstant.bDisabledColor;
+                              }),
+                              visualDensity:
+                                  const VisualDensity(horizontal: -4),
+                            ),
+                            SizedBox(
+                              width: SizeConstant.getHeightWithScreen(10),
+                            ),
+                            Text(
+                              widget.jobList[index].jobName,
+                              style:
+                                  TextStyle(fontSize: SizeConstant.mediumFont),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            )),
+      )),
+    ]);
   }
 }

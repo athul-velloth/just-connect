@@ -5,16 +5,15 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:justconnect/Ui/owner_dashboard/owner_dashboard.dart';
+import 'package:justconnect/Ui/worker_dashboard/home.dart';
 
 import '../constants/color_constants.dart';
 import '../constants/size_constants.dart';
 import 'login.dart';
 
-
-
 class SplashScreen extends StatefulWidget {
-
-
   const SplashScreen({
     super.key,
   });
@@ -24,17 +23,32 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-
+  final storage = GetStorage();
+  String signUpType = "";
 
   @override
   void initState() {
+     WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          signUpType = storage.read('SignUpType');
+        });
+      });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     Future.delayed(const Duration(seconds: 3), () {
-      Get.to(() => const Login());
+     
+      if (signUpType.isEmpty || signUpType == null) {
+        Get.to(() => const Login());
+      } else {
+        if (signUpType == "Owner") {
+          Get.to(() => const OwnerDashboard());
+        } else {
+          Get.to(() => const Home());
+        }
+      }
     });
     ScreenUtil.init(
       context,
@@ -60,7 +74,4 @@ class _SplashScreenState extends State<SplashScreen> {
       ),
     );
   }
-
-
-
 }

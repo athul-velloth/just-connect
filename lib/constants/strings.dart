@@ -4,6 +4,7 @@ class Strings {
   static const String submit = "Submit";
   static const String workerDashboard = "Maid DashBoard";
   static const String jobDetails = "Job Details";
+  static const String userDetails = "User Details";
   static const String SUPABASE_URL =
       "https://vwvvtuxtbdyixmgaowes.supabase.co"; //"https://bmsrqjmhqysfhehulchj.supabase.co";
   static const String SUPABASE_ANON_KEY =

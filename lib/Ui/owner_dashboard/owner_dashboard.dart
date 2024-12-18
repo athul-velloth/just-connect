@@ -9,10 +9,12 @@ import 'package:justconnect/Ui/owner_dashboard/create_job.dart';
 import 'package:justconnect/Ui/owner_dashboard/job_card.dart';
 import 'package:justconnect/Ui/owner_dashboard/job_details.dart';
 import 'package:justconnect/Ui/worker_dashboard/home.dart';
+import 'package:justconnect/Ui/worker_dashboard/user_list.dart';
 import 'package:justconnect/constants/color_constants.dart';
 import 'package:justconnect/constants/size_constants.dart';
 import 'package:justconnect/constants/strings.dart';
 import 'package:justconnect/controller/owner_controller.dart';
+import 'package:justconnect/model/job_details_model.dart';
 import 'package:justconnect/model/user_details.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -25,7 +27,7 @@ class OwnerDashboard extends StatefulWidget {
 
 class _OwnerDashboardState extends State<OwnerDashboard> {
   final OwnerController _ownerController = Get.put(OwnerController());
-  List<UserDetails> userList = [];
+  List<JobDetailsModel> userList = [];
   @override
   void initState() {
     fetchAllUsers();
@@ -35,15 +37,15 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
   Future<void> fetchAllUsers() async {
     try {
       final response = await Supabase.instance.client
-          .from('user') // Replace 'users' with your table name
+          .from('job_create_list') // Replace 'users' with your table name
           .select()
-          .eq('sign_up_type', 'Maid'); // Fetch all rows
+          .eq('job_status', 'Active'); // Fetch all rows
 
       if (response.isNotEmpty) {
         print('User List: $response');
         setState(() {
           userList = (response as List)
-              .map((data) => UserDetails.fromJson(data))
+              .map((data) => JobDetailsModel.fromJson(data))
               .toList();
         });
       } else {
@@ -116,7 +118,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      Get.to(() => const Home());
+                      Get.to(() => const UserList());
                     },
                     child: Icon(
                       Icons.exit_to_app,
@@ -128,35 +130,31 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
               ),
             ),
             SizedBox(height: SizeConstant.getHeightWithScreen(20)),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                  horizontal: SizeConstant.horizontalPadding),
-              child: userList.isNotEmpty
-                  ? Expanded(
-                      child: ListView.separated(
-                          padding: EdgeInsets.zero,
-                          separatorBuilder: (context, index) {
-                            return SizedBox(
-                              height: SizeConstant.getHeightWithScreen(10),
-                            );
-                          },
-                          shrinkWrap: true,
-                          itemCount: userList.length,
-                          itemBuilder: (context, index) {
-                            return GestureDetector(
-                                onTap: () {
-                                  Get.to(
-                                      () => JobDetails(job: userList[index]));
-                                },
-                                child: JobCard(model: userList[index]));
-                          }),
-                    )
-                  : const Expanded(
-                      child: Center(
-                        child: Text("No data Found"),
-                      ),
+            userList.isNotEmpty
+                ? Expanded(
+                    child: ListView.separated(
+                        padding: EdgeInsets.zero,
+                        separatorBuilder: (context, index) {
+                          return SizedBox(
+                            height: SizeConstant.getHeightWithScreen(10),
+                          );
+                        },
+                        shrinkWrap: true,
+                        itemCount: userList.length,
+                        itemBuilder: (context, index) {
+                          return GestureDetector(
+                              onTap: () {
+                                 Get.to(
+                                     () => JobDetails(job: userList[index]));
+                              },
+                              child: JobCard(model: userList[index]));
+                        }),
+                  )
+                : const Expanded(
+                    child: Center(
+                      child: Text("No data Found"),
                     ),
-            )
+                  )
           ],
         ),
       ),
