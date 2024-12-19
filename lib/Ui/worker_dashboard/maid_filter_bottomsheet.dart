@@ -869,7 +869,7 @@ class MaidFilterBottomsheet {
                             ),
                             child: Center(
                               child: Text(
-                                "clear".tr,
+                                "Clear".tr,
                                 style: TextStyle(
                                   fontSize: SizeConstant.mediumFont,
                                   fontWeight: FontWeight.w500,
@@ -933,7 +933,7 @@ class MaidFilterBottomsheet {
                             ),
                             child: Center(
                               child: Text(
-                                "applyFilter".tr,
+                                "Filter".tr,
                                 style: TextStyle(
                                   fontSize: SizeConstant.mediumFont,
                                   fontWeight: FontWeight.w500,
