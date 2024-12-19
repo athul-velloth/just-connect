@@ -7,6 +7,8 @@ import 'package:justconnect/model/job_list.dart';
 import 'package:justconnect/model/location_list.dart';
 import 'package:justconnect/widget/helper.dart';
 import 'package:justconnect/widget/tooltip.dart';
+import 'package:justconnect/widget/ventas_primary_button.dart';
+import 'package:time_range_picker/time_range_picker.dart';
 
 class MaidFilterBottomsheet {
   maidFilterBottomsheet(
@@ -20,7 +22,8 @@ class MaidFilterBottomsheet {
       required List<JobList> jobList,
       required List<LocationList> locationList,
       String? dateFormt,
-      required final Function(String?, String?, String?, String?) onFilter,
+      required final Function(String?, String?, String?, String?, String?)
+          onFilter,
       required final Function() onClear,
       required String title}) async {
     final WorkerController workerController = Get.put(WorkerController());
@@ -108,8 +111,7 @@ class MaidFilterBottomsheet {
                                 ),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     AnimatedTooltip(
                                       content: Text(
@@ -227,8 +229,7 @@ class MaidFilterBottomsheet {
                                 ),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     AnimatedTooltip(
                                       content: Text(
@@ -364,16 +365,14 @@ class MaidFilterBottomsheet {
                                 ),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     AnimatedTooltip(
                                       content: Text(
                                         locationList[index].locationName ?? "-",
                                       ),
                                       child: Text(
-                                        locationList[index].locationName ??
-                                            "-",
+                                        locationList[index].locationName ?? "-",
                                         textAlign: TextAlign.start,
                                         maxLines: 1,
                                         style: TextStyle(
@@ -407,126 +406,206 @@ class MaidFilterBottomsheet {
           });
           break;
         case "Time":
-          widget = Obx(() {
-            return workerController.jobList.isEmpty
-                ? Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height / 3.5,
-                      ),
-                      Center(
-                        child: Text(
-                          'noDataFound'.tr,
-                          style: TextStyle(
-                            color: ColorConstant.black.withOpacity(0.88),
-                            fontSize: SizeConstant.mediumFont,
-                          ),
-                        ),
-                      ),
-                    ],
-                  )
-                : ListView.separated(
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: jobList.length,
-                    shrinkWrap: true,
-                    separatorBuilder: (context, index) {
-                      return SizedBox(
-                        height: SizeConstant.getHeightWithScreen(2),
-                        child: Divider(
-                          color: ColorConstant.dividerColor,
-                          height: 0.5,
-                        ),
-                      );
-                    },
-                    itemBuilder: (BuildContext context, int index) {
-                      return Padding(
-                        padding: EdgeInsets.only(
-                          left: SizeConstant.getHeightWithScreen(20),
-                          right: SizeConstant.getHeightWithScreen(20),
-                          top: SizeConstant.getHeightWithScreen(15),
-                          bottom: SizeConstant.getHeightWithScreen(15),
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Checkbox(
-                              visualDensity: const VisualDensity(
-                                  horizontal: -4, vertical: -4),
-                              materialTapTargetSize:
-                                  MaterialTapTargetSize.shrinkWrap,
-                              activeColor: ColorConstant.primaryColor,
-                              checkColor: ColorConstant.white,
-                              value: workerController.timeTypeCheckChecked
-                                  .contains(jobList[index]),
-                              onChanged: (bool? selected) {
-                                if (selected == true) {
-                                  setState(() {
-                                    workerController.timeTypeCheckChecked
-                                        .clear();
-                                    workerController.timeTypeCheckChecked
-                                        .add(jobList[index]);
-                                    workerController.timeName.value =
-                                        jobList[index].time;
-                                  });
-                                } else {
-                                  setState(() {
-                                    workerController.timeTypeCheckChecked
-                                        .clear();
-                                    workerController.timeName.value = "";
-                                  });
-                                }
-                              },
-                            ),
-                            Expanded(
-                              child: Padding(
-                                padding: EdgeInsets.only(
-                                  left: SizeConstant.getHeightWithScreen(16),
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                  children: [
-                                    AnimatedTooltip(
-                                      content: Text(
-                                        jobList[index].time ?? "-",
-                                      ),
-                                      child: Text(
-                                        jobList[index].time ?? "-",
-                                        textAlign: TextAlign.start,
-                                        maxLines: 1,
-                                        style: TextStyle(
-                                          overflow: TextOverflow.ellipsis,
-                                          color: ColorConstant.black
-                                              .withOpacity(0.88),
-                                          fontSize: SizeConstant.mediumFont,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      ),
-                                    ),
-                                    // Text(
-                                    //   jobList[index].id.toString() ?? "-",
-                                    //   style: TextStyle(
-                                    //     overflow: TextOverflow.ellipsis,
-                                    //     color: ColorConstant.black
-                                    //         .withOpacity(0.88),
-                                    //     fontSize: SizeConstant.smallFont,
-                                    //     fontWeight: FontWeight.w300,
-                                    //   ),
-                                    // ),
-                                  ],
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      );
+          widget = Container(
+            child: InkWell(
+                onTap: () async {
+                  workerController.timeRange = await showTimeRangePicker(
+                    context: context,
+                    start: const TimeOfDay(
+                        hour: 8, minute: 0), // Default start selection
+                    end: const TimeOfDay(
+                        hour: 17, minute: 0), // Default end selection
+                    disabledTime: workerController.getDisabledTimeRanges(),
+                    disabledColor: Colors.grey.withOpacity(
+                        0.5), // Optional: visually indicate disabled times
+                    interval: const Duration(
+                        minutes: 15), // Optional: 15-minute intervals
+                    use24HourFormat: false, // Optional: 12-hour format
+                  );
+                  print(
+                      "result ${workerController.timeRange?.startTime} to${workerController.timeRange?.endTime}");
+                  if (workerController.timeRange != null) {
+                    setState(() {
+                      workerController.startTime =
+                          workerController.timeRange?.startTime;
+                      workerController.endTime =
+                          workerController.timeRange?.endTime;
+                      workerController.timeName.value =
+                          "${workerController.formatTime(workerController.startTime, context)} - ${workerController.formatTime(workerController.endTime, context)}";
                     });
-          });
+                  }
+                },
+                child: Column(
+                  children: [
+                    Container(
+                      width: SizeConstant.getHeightWithScreen(500),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: SizeConstant.getHeightWithScreen(17),
+                          vertical: SizeConstant.getHeightWithScreen(5)),
+                      height: SizeConstant.getHeightWithScreen(55),
+                      child: Text(
+                        'Time Range \n${workerController.formatTime(workerController.startTime, context)} ${workerController.formatTime(workerController.endTime, context)}',
+                      ),
+                    ),
+                    VentasPrimaryButton(
+                      onTap: () async {
+                        workerController.timeRange = await showTimeRangePicker(
+                          context: context,
+                          start: const TimeOfDay(
+                              hour: 8, minute: 0), // Default start selection
+                          end: const TimeOfDay(
+                              hour: 17, minute: 0), // Default end selection
+                          disabledTime:
+                              workerController.getDisabledTimeRanges(),
+                          disabledColor: Colors.grey.withOpacity(
+                              0.5), // Optional: visually indicate disabled times
+                          interval: const Duration(
+                              minutes: 15), // Optional: 15-minute intervals
+                          use24HourFormat: false, // Optional: 12-hour format
+                        );
+                        print(
+                            "result ${workerController.timeRange?.startTime} to${workerController.timeRange?.endTime}");
+                        if (workerController.timeRange != null) {
+                          setState(() {
+                            workerController.startTime =
+                                workerController.timeRange?.startTime;
+                            workerController.endTime =
+                                workerController.timeRange?.endTime;
+                            workerController.timeName.value =
+                                "${workerController.formatTime(workerController.startTime, context)} - ${workerController.formatTime(workerController.endTime, context)}";
+                          });
+                        }
+                      },
+                      label: "Select Time",
+                      textColor: ColorConstant.white,
+                      borderRadius: 10,
+                      textSize: SizeConstant.mediumFont,
+                      weight: FontWeight.w500,
+                      btnHeight: SizeConstant.getHeightWithScreen(40),
+                      btnWidth: (MediaQuery.of(context).size.width / 2) -
+                          SizeConstant.getHeightWithScreen(45),
+                    ),
+                  ],
+                )),
+          );
+          // widget = Obx(() {
+          //   return workerController.jobList.isEmpty
+          //       ? Column(
+          //           mainAxisAlignment: MainAxisAlignment.center,
+          //           children: [
+          //             SizedBox(
+          //               height: MediaQuery.of(context).size.height / 3.5,
+          //             ),
+          //             Center(
+          //               child: Text(
+          //                 'noDataFound'.tr,
+          //                 style: TextStyle(
+          //                   color: ColorConstant.black.withOpacity(0.88),
+          //                   fontSize: SizeConstant.mediumFont,
+          //                 ),
+          //               ),
+          //             ),
+          //           ],
+          //         )
+          //       : ListView.separated(
+          //           physics: const NeverScrollableScrollPhysics(),
+          //           itemCount: jobList.length,
+          //           shrinkWrap: true,
+          //           separatorBuilder: (context, index) {
+          //             return SizedBox(
+          //               height: SizeConstant.getHeightWithScreen(2),
+          //               child: Divider(
+          //                 color: ColorConstant.dividerColor,
+          //                 height: 0.5,
+          //               ),
+          //             );
+          //           },
+          //           itemBuilder: (BuildContext context, int index) {
+          //             return Padding(
+          //               padding: EdgeInsets.only(
+          //                 left: SizeConstant.getHeightWithScreen(20),
+          //                 right: SizeConstant.getHeightWithScreen(20),
+          //                 top: SizeConstant.getHeightWithScreen(15),
+          //                 bottom: SizeConstant.getHeightWithScreen(15),
+          //               ),
+          //               child: Row(
+          //                 crossAxisAlignment: CrossAxisAlignment.start,
+          //                 children: [
+          //                   Checkbox(
+          //                     visualDensity: const VisualDensity(
+          //                         horizontal: -4, vertical: -4),
+          //                     materialTapTargetSize:
+          //                         MaterialTapTargetSize.shrinkWrap,
+          //                     activeColor: ColorConstant.primaryColor,
+          //                     checkColor: ColorConstant.white,
+          //                     value: workerController.timeTypeCheckChecked
+          //                         .contains(jobList[index]),
+          //                     onChanged: (bool? selected) {
+          //                       if (selected == true) {
+          //                         setState(() {
+          //                           workerController.timeTypeCheckChecked
+          //                               .clear();
+          //                           workerController.timeTypeCheckChecked
+          //                               .add(jobList[index]);
+          //                           workerController.timeName.value =
+          //                               jobList[index].time;
+          //                         });
+          //                       } else {
+          //                         setState(() {
+          //                           workerController.timeTypeCheckChecked
+          //                               .clear();
+          //                           workerController.timeName.value = "";
+          //                         });
+          //                       }
+          //                     },
+          //                   ),
+          //                   Expanded(
+          //                     child: Padding(
+          //                       padding: EdgeInsets.only(
+          //                         left: SizeConstant.getHeightWithScreen(16),
+          //                       ),
+          //                       child: Column(
+          //                         mainAxisAlignment: MainAxisAlignment.start,
+          //                         crossAxisAlignment:
+          //                             CrossAxisAlignment.start,
+          //                         children: [
+          //                           AnimatedTooltip(
+          //                             content: Text(
+          //                               jobList[index].time ?? "-",
+          //                             ),
+          //                             child: Text(
+          //                               jobList[index].time ?? "-",
+          //                               textAlign: TextAlign.start,
+          //                               maxLines: 1,
+          //                               style: TextStyle(
+          //                                 overflow: TextOverflow.ellipsis,
+          //                                 color: ColorConstant.black
+          //                                     .withOpacity(0.88),
+          //                                 fontSize: SizeConstant.mediumFont,
+          //                                 fontWeight: FontWeight.w400,
+          //                               ),
+          //                             ),
+          //                           ),
+          //                           // Text(
+          //                           //   jobList[index].id.toString() ?? "-",
+          //                           //   style: TextStyle(
+          //                           //     overflow: TextOverflow.ellipsis,
+          //                           //     color: ColorConstant.black
+          //                           //         .withOpacity(0.88),
+          //                           //     fontSize: SizeConstant.smallFont,
+          //                           //     fontWeight: FontWeight.w300,
+          //                           //   ),
+          //                           // ),
+          //                         ],
+          //                       ),
+          //                     ),
+          //                   )
+          //                 ],
+          //               ),
+          //             );
+          //           });
+          // });
           break;
-    
-    
       }
       return widget;
     }
@@ -663,7 +742,7 @@ class MaidFilterBottomsheet {
                                       color: ColorConstant.grey21,
                                       height: 0.5,
                                     ),
-                                 
+
                                     GestureDetector(
                                       onTap: () {
                                         setState(
@@ -706,12 +785,12 @@ class MaidFilterBottomsheet {
                                         ),
                                       ),
                                     ),
-                                    
+
                                     Divider(
                                       color: ColorConstant.grey21,
                                       height: 0.5,
                                     ),
-                                    
+
                                     GestureDetector(
                                       onTap: () {
                                         setState(
@@ -755,12 +834,12 @@ class MaidFilterBottomsheet {
                                         ),
                                       ),
                                     ),
-                                   
+
                                     Divider(
                                       color: ColorConstant.grey21,
                                       height: 0.5,
                                     ),
-                                    
+
                                     GestureDetector(
                                       onTap: () {
                                         setState(
@@ -803,7 +882,7 @@ class MaidFilterBottomsheet {
                                         ),
                                       ),
                                     ),
-                                   
+
                                     Divider(
                                       color: ColorConstant.grey21,
                                       height: 0.5,
@@ -890,8 +969,7 @@ class MaidFilterBottomsheet {
                                   .priceTypeCheckChecked.isNotEmpty) ||
                               (workerController
                                   .locationTypeCheckChecked.isNotEmpty) ||
-                              (workerController
-                                  .timeTypeCheckChecked.isNotEmpty) ||
+                              (workerController.timeName.isNotEmpty) ||
                               ((workerController.selectedIndex != -1))) {
                             Helper.close();
                             // controller.dealersId = int.parse(
@@ -902,7 +980,14 @@ class MaidFilterBottomsheet {
                               workerController.maidtypeName.value,
                               workerController.priceName.value,
                               workerController.locationName.value,
-                              workerController.timeName.value,
+                              workerController.startTime == null
+                                  ? null
+                                  : workerController.formatTime(
+                                      workerController.startTime, context),
+                              workerController.endTime == null
+                                  ? null
+                                  : workerController.formatTime(
+                                      workerController.endTime, context),
                             );
                           } else {
                             return;
@@ -920,8 +1005,7 @@ class MaidFilterBottomsheet {
                                           .priceTypeCheckChecked.isNotEmpty) ||
                                       (workerController.locationTypeCheckChecked
                                           .isNotEmpty) ||
-                                      (workerController
-                                          .timeTypeCheckChecked.isNotEmpty)
+                                      (workerController.timeName.isNotEmpty)
                                   ? ColorConstant.primaryColor
                                   : ColorConstant.pgvActiveDotColor,
                               border: Border.all(
@@ -946,8 +1030,7 @@ class MaidFilterBottomsheet {
                                           (workerController
                                               .locationTypeCheckChecked
                                               .isNotEmpty) ||
-                                          (workerController
-                                              .timeTypeCheckChecked.isNotEmpty)
+                                          (workerController.timeName.isNotEmpty)
                                       ? ColorConstant.white
                                       : ColorConstant.tfHintTextColor,
                                 ),

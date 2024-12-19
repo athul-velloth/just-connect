@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:justconnect/Ui/worker_dashboard/user_list.dart';
 import 'package:justconnect/model/Job.dart';
 import 'package:justconnect/model/job_list.dart';
 import 'package:justconnect/model/location_list.dart';
 import 'package:justconnect/model/user_details.dart';
+import 'package:time_range_picker/time_range_picker.dart';
 
 class WorkerController extends GetxController {
   List<JobList> maidTypeCheckChecked = [];
@@ -23,6 +25,10 @@ class WorkerController extends GetxController {
   var timeName = "".obs;
   int selectedIndex = -1;
 
+  TimeRange? timeRange;
+  TimeOfDay? startTime;
+  TimeOfDay? endTime;
+
   clearReportFilter() {
     selectedReportFilter = "Maid Type";
     selectedIndex = -1;
@@ -34,6 +40,23 @@ class WorkerController extends GetxController {
     priceName.value = "";
     locationName.value = "";
     timeName.value = "";
+    startTime = null;
+    endTime = null;
+  }
+
+  String formatTime(TimeOfDay? time, BuildContext context) {
+    if (time == null) return '';
+    final now = DateTime.now();
+    final formattedTime =
+        TimeOfDay(hour: time.hour, minute: time.minute).format(context);
+    return formattedTime;
+  }
+
+  TimeRange getDisabledTimeRanges() {
+    return TimeRange(
+      startTime: const TimeOfDay(hour: 0, minute: 0), // Midnight to 8:00 AM
+      endTime: const TimeOfDay(hour: 8, minute: 0),
+    );
   }
   //var selectedDealer = JobList().obs;
   // final List<Job> jobList = [

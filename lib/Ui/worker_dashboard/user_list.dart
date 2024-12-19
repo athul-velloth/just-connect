@@ -109,6 +109,7 @@ class _HomeState extends State<UserList> {
         setState(() {
           jobList =
               (response as List).map((data) => JobList.fromJson(data)).toList();
+          jobList.sort((a, b) => a.id.compareTo(b.id));
           _ownerController.jobList.value = jobList;
         });
       } else {
@@ -129,13 +130,61 @@ class _HomeState extends State<UserList> {
           locationList = (response as List)
               .map((data) => LocationList.fromJson(data))
               .toList();
-        _ownerController.locationList.value = locationList;
+          _ownerController.locationList.value = locationList;
         });
       } else {
         print('No users found.');
       }
     } catch (e) {
       print('Error fetching user list: $e');
+    }
+  }
+
+  bool timeRangesOverlap(
+      TimeOfDay start1, TimeOfDay end1, TimeOfDay start2, TimeOfDay end2) {
+    final start1Minutes = start1.hour * 60 + start1.minute;
+    final end1Minutes = end1.hour * 60 + end1.minute;
+    final start2Minutes = start2.hour * 60 + start2.minute;
+    final end2Minutes = end2.hour * 60 + end2.minute;
+
+    print(
+        "object   $start1Minutes    $start2Minutes     $end1Minutes     $end2Minutes");
+
+    return start1Minutes >= start2Minutes && end1Minutes <= end2Minutes;
+  }
+
+  TimeOfDay parseAmPmTime(String time) {
+    try {
+      // Trim the time string to remove any leading/trailing spaces
+      time = time.trim();
+
+      // Check if the time contains AM or PM
+      final amPm = time.contains('AM') || time.contains('PM');
+
+      if (!amPm) {
+        throw FormatException("Invalid time format: $time");
+      }
+
+      // Split the time string by space to separate the time and the period (AM/PM)
+      final parts = time.split(' ');
+      final timeParts = parts[0].split(':');
+
+      // Extract the hour and minute
+      int hour = int.parse(timeParts[0]);
+      int minute = int.parse(timeParts[1]);
+
+      // If the time is PM, adjust the hour to the 24-hour format
+      if (parts[1] == 'PM' && hour != 12) {
+        hour += 12; // Convert PM times to 24-hour format
+      }
+      if (parts[1] == 'AM' && hour == 12) {
+        hour = 0; // Handle 12:00 AM case
+      }
+
+      return TimeOfDay(hour: hour, minute: minute);
+    } catch (e) {
+      print("Error parsing time: $time");
+      throw FormatException("Invalid time format: $time");
     }
   }
 
@@ -198,100 +247,140 @@ class _HomeState extends State<UserList> {
                       ),
                     ),
                     Spacer(),
-                   signUpType == "Owner" ?  GestureDetector(
-                      onTap: () {
-                        MaidFilterBottomsheet()
-                            .filterMultipleStatusBottomsheet(
-                                context: context,
-                                title: "filter",
-                                jobList: jobList,
-                                locationList: locationList,
-                                onFilter: (jobType, price, location, time) {
-                                  int maxPrice = 0;
-                                  int minPrice = 0;
+                    signUpType == "Owner"
+                        ? GestureDetector(
+                            onTap: () {
+                              MaidFilterBottomsheet()
+                                  .filterMultipleStatusBottomsheet(
+                                      context: context,
+                                      title: "filter",
+                                      jobList: jobList,
+                                      locationList: locationList,
+                                      onFilter: (jobType, price, location,
+                                          targetStart, targetEnd) {
+                                        int maxPrice = 0;
+                                        int minPrice = 0;
 
-                                  // Price logic
-                                  if (price != null && price.contains(' - ')) {
-                                    List<String> priceRange = price
-                                        .split(' - ')
-                                        .map((e) => e.trim())
-                                        .toList();
-                                    if (priceRange.length == 2) {
-                                      minPrice = int.tryParse(priceRange[0]) ??
-                                          0; // Default to 0 if parsing fails
-                                      maxPrice = int.tryParse(priceRange[1]) ??
-                                          0; // Default to 0 if parsing fails
-                                    }
-                                  } else if (price != null &&
-                                      price.contains('and Below')) {
-                                    String priceString =
-                                        price.split(' and Below')[0].trim();
-                                    maxPrice = int.tryParse(priceString) ?? 0;
-                                  } else if (price != null &&
-                                      price.contains('and above')) {
-                                    String priceString =
-                                        price.split(' and above')[0].trim();
-                                    minPrice = int.tryParse(priceString) ?? 0;
-                                    maxPrice =
-                                        100000000; // Arbitrary large number for "above" condition
-                                  }
+                                        // Price logic
+                                        if (price != null &&
+                                            price.contains(' - ')) {
+                                          List<String> priceRange = price
+                                              .split(' - ')
+                                              .map((e) => e.trim())
+                                              .toList();
+                                          if (priceRange.length == 2) {
+                                            minPrice = int.tryParse(
+                                                    priceRange[0]) ??
+                                                0; // Default to 0 if parsing fails
+                                            maxPrice = int.tryParse(
+                                                    priceRange[1]) ??
+                                                0; // Default to 0 if parsing fails
+                                          }
+                                        } else if (price != null &&
+                                            price.contains('and Below')) {
+                                          String priceString = price
+                                              .split(' and Below')[0]
+                                              .trim();
+                                          maxPrice =
+                                              int.tryParse(priceString) ?? 0;
+                                        } else if (price != null &&
+                                            price.contains('and above')) {
+                                          String priceString = price
+                                              .split(' and above')[0]
+                                              .trim();
+                                          minPrice =
+                                              int.tryParse(priceString) ?? 0;
+                                          maxPrice =
+                                              100000000; // Arbitrary large number for "above" condition
+                                        }
 
-                                  // Filter logic
-                                  setState(() {
-                                    userList = _ownerController.userList.value
-                                        .where((job) {
-                                      bool matchesJobType = (jobType != null &&
-                                              jobType.isNotEmpty)
-                                          ? (job.jobType.contains(jobType ??
-                                              '')) // If jobType is available, filter based on jobType
-                                          : true; // Otherwise, ignore jobType in the filter
+                                        // Filter logic
+                                        setState(() {
+                                          userList = _ownerController
+                                              .userList.value
+                                              .where((job) {
+                                            bool matchesJobType = (jobType !=
+                                                        null &&
+                                                    jobType.isNotEmpty)
+                                                ? (job.jobType.contains(jobType ??
+                                                    '')) // If jobType is available, filter based on jobType
+                                                : true; // Otherwise, ignore jobType in the filter
 
-                                      bool matchesPrice =
-                                          (price != null && price.isNotEmpty)
-                                              ? (job.price != null) &&
-                                                  job.price! >= minPrice &&
-                                                  job.price! <= maxPrice
-                                              : true;
+                                            bool matchesPrice = (price !=
+                                                        null &&
+                                                    price.isNotEmpty)
+                                                ? (job.price != null) &&
+                                                    job.price! >= minPrice &&
+                                                    job.price! <= maxPrice
+                                                : true;
 
-                                      bool matchesLocation = (location !=
-                                                  null &&
-                                              location.isNotEmpty)
-                                          ? (job.city ?? '').contains(location.trim() ??
-                                              '') // Match location if provided
-                                          : true; // Ignore location filter if it's empty or null
+                                            bool matchesLocation = (location !=
+                                                        null &&
+                                                    location.isNotEmpty)
+                                                ? (job.city ?? '').contains(
+                                                    location.trim() ??
+                                                        '') // Match location if provided
+                                                : true; // Ignore location filter if it's empty or null
+                                            print(
+                                                "object data   ${job.availableTime}      $targetStart  $targetEnd");
+                                           bool matchesTime = true;
+                                            if ((targetStart != null &&
+                                                targetStart.isNotEmpty &&
+                                                targetEnd != null &&
+                                                targetEnd.isNotEmpty)) {
+                                              final jobTimes = job.availableTime
+                                                  .toString()
+                                                  .split(' - ');
+                                              final jobStart =
+                                                  parseAmPmTime(jobTimes[0]);
+                                              final jobEnd =
+                                                  parseAmPmTime(jobTimes[1]);
 
-                                      bool matchesTime = (time != null &&
-                                              time.isNotEmpty)
-                                          ? (job.availableTime ?? '') ==
-                                              time // If time is provided, match the time
-                                          : true; // Otherwise, ignore time in the filter
+                                              final targetStart1 =
+                                                  parseAmPmTime(
+                                                      targetStart.toString());
+                                              final targetEnd1 = parseAmPmTime(
+                                                  targetEnd.toString());
 
-                                      return matchesJobType &&
-                                          matchesPrice &&
-                                          matchesLocation &&
-                                          matchesTime;
-                                    }).toList();
-                                  });
+                                               matchesTime = (targetStart.isNotEmpty &&
+                                                      targetEnd.isNotEmpty)
+                                                  ? timeRangesOverlap(
+                                                      jobStart,
+                                                      jobEnd,
+                                                      targetStart1,
+                                                      targetEnd1)
+                                                  : true; // Otherwise, ignore time in the filter
+                                            } else {
+                                              
+                                            }
+                                            return matchesJobType &&
+                                                matchesPrice &&
+                                                matchesLocation &&
+                                                matchesTime;
+                                          }).toList();
+                                        });
 
-                                  print("object data   ${filteredJobs}");
-                                },
-                                onClear: () {
-                                  setState(
-                                    () {
-                                      WidgetsBinding.instance
-                                          .addPostFrameCallback((timeStamp) {
-                                        fetchAllUsers(signUpType);
+                                        print("object data   ${userList}");
+                                      },
+                                      onClear: () {
+                                        setState(
+                                          () {
+                                            WidgetsBinding.instance
+                                                .addPostFrameCallback(
+                                                    (timeStamp) {
+                                              fetchAllUsers(signUpType);
+                                            });
+                                          },
+                                        );
                                       });
-                                    },
-                                  );
-                                });
-                      },
-                      child: Icon(
-                        Icons.filter_list,
-                        size: SizeConstant.getHeightWithScreen(26),
-                        color: ColorConstant.black.withOpacity(0.88),
-                      ),
-                    ) : const SizedBox(),
+                            },
+                            child: Icon(
+                              Icons.filter_list,
+                              size: SizeConstant.getHeightWithScreen(26),
+                              color: ColorConstant.black.withOpacity(0.88),
+                            ),
+                          )
+                        : const SizedBox(),
                   ],
                 ),
               ),

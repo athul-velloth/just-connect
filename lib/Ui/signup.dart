@@ -83,6 +83,7 @@ class _SignUpState extends State<SignUp> {
         setState(() {
           jobList =
               (response as List).map((data) => JobList.fromJson(data)).toList();
+          jobList.sort((a, b) => a.id.compareTo(b.id));
         });
       } else {
         print('No users found.');
@@ -566,12 +567,20 @@ class _SignUpState extends State<SignUp> {
                                 onTap: () async {
                                   timeRange = await showTimeRangePicker(
                                     context: context,
-                                    start: const TimeOfDay(hour: 8, minute: 0), // Default start selection
-                                    end: const TimeOfDay(hour: 17, minute: 0), // Default end selection
+                                    start: const TimeOfDay(
+                                        hour: 8,
+                                        minute: 0), // Default start selection
+                                    end: const TimeOfDay(
+                                        hour: 17,
+                                        minute: 0), // Default end selection
                                     disabledTime: _getDisabledTimeRanges(),
-                                    disabledColor: Colors.grey.withOpacity(0.5), // Optional: visually indicate disabled times
-                                    interval: const Duration(minutes: 15), // Optional: 15-minute intervals
-                                    use24HourFormat: false, // Optional: 12-hour format
+                                    disabledColor: Colors.grey.withOpacity(
+                                        0.5), // Optional: visually indicate disabled times
+                                    interval: const Duration(
+                                        minutes:
+                                            15), // Optional: 15-minute intervals
+                                    use24HourFormat:
+                                        false, // Optional: 12-hour format
                                   );
                                   print(
                                       "result ${timeRange?.startTime} to${timeRange?.endTime}");
@@ -1452,120 +1461,120 @@ class _TimeSelectionModalState extends State<TimeSelectionModal> {
     return Stack(children: [
       SingleChildScrollView(
           child: Container(
-            padding: EdgeInsets.only(top: SizeConstant.getHeightWithScreen(50)),
-            color: const Color(0xff757575),
-            child: Container(
-                padding: EdgeInsets.only(top: SizeConstant.getHeightWithScreen(5)),
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                        topLeft:
+        padding: EdgeInsets.only(top: SizeConstant.getHeightWithScreen(50)),
+        color: const Color(0xff757575),
+        child: Container(
+            padding: EdgeInsets.only(top: SizeConstant.getHeightWithScreen(5)),
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                    topLeft:
                         Radius.circular(SizeConstant.getHeightWithScreen(30)),
-                        topRight:
+                    topRight:
                         Radius.circular(SizeConstant.getHeightWithScreen(30)))),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    const SizedBox(height: 5.0),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          margin:
-                          const EdgeInsets.only(top: 0, left: 16, right: 10),
-                          child: Text(
-                            "Time List",
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontFamily: "Outfit",
-                                fontWeight: FontWeight.w600,
-                                fontSize: SizeConstant.mediumFont),
-                          ),
-                        ),
-                        IconButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            icon: Icon(
-                              Icons.close,
-                              color: ColorConstant.grey2,
-                              size: SizeConstant.getHeightWithScreen(25),
-                            ))
-                      ],
-                    ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                const SizedBox(height: 5.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
                     Container(
-                      margin: const EdgeInsets.only(top: 0, bottom: 27),
-                      child: ListView.builder(
-                        padding: EdgeInsets.zero,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: widget.jobList.length,
-                        itemBuilder: (context, index) => GestureDetector(
-                          onTap: () {
-                            Navigator.pop(context, index.toString());
-                          },
-                          child: Container(
-                            margin: EdgeInsets.only(
-                                top: SizeConstant.getHeightWithScreen(10),
-                                left: SizeConstant.getHeightWithScreen(15),
-                                right: SizeConstant.getHeightWithScreen(15)),
-                            padding: EdgeInsets.only(
-                                left: SizeConstant.getHeightWithScreen(16),
-                                right: SizeConstant.getHeightWithScreen(16),
-                                top: SizeConstant.getHeightWithScreen(16),
-                                bottom: SizeConstant.getHeightWithScreen(14)),
-                            decoration: BoxDecoration(
-                                color:
+                      margin:
+                          const EdgeInsets.only(top: 0, left: 16, right: 10),
+                      child: Text(
+                        "Time List",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontFamily: "Outfit",
+                            fontWeight: FontWeight.w600,
+                            fontSize: SizeConstant.mediumFont),
+                      ),
+                    ),
+                    IconButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        icon: Icon(
+                          Icons.close,
+                          color: ColorConstant.grey2,
+                          size: SizeConstant.getHeightWithScreen(25),
+                        ))
+                  ],
+                ),
+                Container(
+                  margin: const EdgeInsets.only(top: 0, bottom: 27),
+                  child: ListView.builder(
+                    padding: EdgeInsets.zero,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: widget.jobList.length,
+                    itemBuilder: (context, index) => GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context, index.toString());
+                      },
+                      child: Container(
+                        margin: EdgeInsets.only(
+                            top: SizeConstant.getHeightWithScreen(10),
+                            left: SizeConstant.getHeightWithScreen(15),
+                            right: SizeConstant.getHeightWithScreen(15)),
+                        padding: EdgeInsets.only(
+                            left: SizeConstant.getHeightWithScreen(16),
+                            right: SizeConstant.getHeightWithScreen(16),
+                            top: SizeConstant.getHeightWithScreen(16),
+                            bottom: SizeConstant.getHeightWithScreen(14)),
+                        decoration: BoxDecoration(
+                            color:
                                 selectedRadioValue == widget.jobList[index].id
                                     ? ColorConstant.orange4
                                     : ColorConstant.white,
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                    width: SizeConstant.getHeightWithScreen(1),
-                                    color: selectedRadioValue ==
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                                width: SizeConstant.getHeightWithScreen(1),
+                                color: selectedRadioValue ==
                                         widget.jobList[index].id
-                                        ? ColorConstant.white
-                                        : ColorConstant.vibBgColor)),
-                            child: Row(
-                              children: [
-                                Radio(
-                                  value: widget.jobList[index].id,
-                                  groupValue: selectedRadioValue,
-                                  materialTapTargetSize:
+                                    ? ColorConstant.white
+                                    : ColorConstant.vibBgColor)),
+                        child: Row(
+                          children: [
+                            Radio(
+                              value: widget.jobList[index].id,
+                              groupValue: selectedRadioValue,
+                              materialTapTargetSize:
                                   MaterialTapTargetSize.shrinkWrap,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      Navigator.pop(context, index.toString());
-                                    });
-                                  },
-                                  fillColor:
+                              onChanged: (value) {
+                                setState(() {
+                                  Navigator.pop(context, index.toString());
+                                });
+                              },
+                              fillColor:
                                   MaterialStateProperty.resolveWith<Color>(
-                                          (Set<MaterialState> states) {
-                                        if (states.contains(MaterialState.selected)) {
-                                          return ColorConstant.primaryColor;
-                                        }
-                                        return ColorConstant.bDisabledColor;
-                                      }),
-                                  visualDensity:
+                                      (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.selected)) {
+                                  return ColorConstant.primaryColor;
+                                }
+                                return ColorConstant.bDisabledColor;
+                              }),
+                              visualDensity:
                                   const VisualDensity(horizontal: -4),
-                                ),
-                                SizedBox(
-                                  width: SizeConstant.getHeightWithScreen(10),
-                                ),
-                                Text(
-                                  widget.jobList[index].time,
-                                  style:
-                                  TextStyle(fontSize: SizeConstant.mediumFont),
-                                ),
-                              ],
                             ),
-                          ),
+                            SizedBox(
+                              width: SizeConstant.getHeightWithScreen(10),
+                            ),
+                            Text(
+                              widget.jobList[index].time,
+                              style:
+                                  TextStyle(fontSize: SizeConstant.mediumFont),
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                  ],
-                )),
-          )),
+                  ),
+                ),
+              ],
+            )),
+      )),
     ]);
   }
 }
