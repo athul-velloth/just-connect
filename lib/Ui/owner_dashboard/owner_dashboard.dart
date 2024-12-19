@@ -11,14 +11,17 @@ import 'package:justconnect/Ui/owner_dashboard/job_card.dart';
 import 'package:justconnect/Ui/owner_dashboard/job_details.dart';
 import 'package:justconnect/Ui/user_profile.dart';
 import 'package:justconnect/Ui/worker_dashboard/home.dart';
+import 'package:justconnect/Ui/worker_dashboard/maid_filter_bottomsheet.dart';
 import 'package:justconnect/Ui/worker_dashboard/user_list.dart';
 import 'package:justconnect/constants/color_constants.dart';
 import 'package:justconnect/constants/size_constants.dart';
 import 'package:justconnect/constants/strings.dart';
 import 'package:justconnect/controller/owner_controller.dart';
+import 'package:justconnect/controller/worker_controller.dart';
 import 'package:justconnect/main.dart';
 import 'package:justconnect/model/job_details_model.dart';
 import 'package:justconnect/model/job_list.dart';
+import 'package:justconnect/model/location_list.dart';
 import 'package:justconnect/model/user_details.dart';
 import 'package:justconnect/widget/common_button.dart';
 import 'package:justconnect/widget/helper.dart';
@@ -32,15 +35,17 @@ class OwnerDashboard extends StatefulWidget {
 }
 
 class _OwnerDashboardState extends State<OwnerDashboard> with RouteAware {
-  final OwnerController _ownerController = Get.put(OwnerController());
+  final WorkerController _ownerController = Get.put(WorkerController());
   List<JobDetailsModel> userList = [];
   List<String> resultId = [];
   String jobResult = "";
   List<JobList> jobList = [];
+  List<LocationList> locationList = [];
   String imageUrl = "";
   String name = "";
   String UserId = "";
   final storage = GetStorage();
+
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -121,6 +126,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> with RouteAware {
         setState(() {
           jobList =
               (response as List).map((data) => JobList.fromJson(data)).toList();
+          _ownerController.jobList.value = jobList;
         });
       } else {
         print('No users found.');

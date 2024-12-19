@@ -2,7 +2,7 @@ class JobList {
   final int id;
   final String createdAt;
   final String jobName;
-  final int priceHr;
+  final String priceHr;
   final String location;
   final String time;
 
@@ -21,7 +21,7 @@ class JobList {
       id: json['id'] as int,
       createdAt: json['created_at'] as String,
       jobName: json['job_name'] as String,
-      priceHr: json['price_hr'] as int,
+      priceHr: json['price_hr'] as String,
       location: json['location'] as String,
       time: json['time'] as String,
     );

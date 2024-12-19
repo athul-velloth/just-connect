@@ -8,8 +8,11 @@ import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:justconnect/Ui/job_detail_page.dart';
 import 'package:justconnect/Ui/owner_dashboard/owner_dashboard.dart';
+import 'package:justconnect/Ui/worker_dashboard/maid_filter_bottomsheet.dart';
 import 'package:justconnect/constants/strings.dart';
 import 'package:justconnect/controller/worker_controller.dart';
+import 'package:justconnect/model/job_list.dart';
+import 'package:justconnect/model/location_list.dart';
 import 'package:justconnect/model/user_details.dart';
 import 'package:justconnect/widget/helper.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -30,12 +33,17 @@ class _HomeState extends State<UserList> {
   List<UserDetails> userList = [];
   final storage = GetStorage();
   String signUpType = "";
+  List<JobList> jobList = [];
+  List<LocationList> locationList = [];
+  List<UserDetails> filteredJobs = [];
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         signUpType = storage.read('SignUpType');
         fetchAllUsers(signUpType);
+        fetchAllJob();
+        fetchAllLocation();
       });
     });
 
@@ -61,6 +69,7 @@ class _HomeState extends State<UserList> {
           userList = (response as List)
               .map((data) => UserDetails.fromJson(data))
               .toList();
+          _ownerController.userList.value = userList;
         });
       } else {
         Helper.close();
@@ -89,6 +98,45 @@ class _HomeState extends State<UserList> {
     // Format the DateTime to the desired format (yyyy-MM-dd)
     String formattedDate = DateFormat('yyyy-MM-dd').format(dateTime);
     return formattedDate;
+  }
+
+  Future<void> fetchAllJob() async {
+    try {
+      final response =
+          await Supabase.instance.client.from('job_type_list').select();
+      if (response.isNotEmpty) {
+        print('User List: $response');
+        setState(() {
+          jobList =
+              (response as List).map((data) => JobList.fromJson(data)).toList();
+          _ownerController.jobList.value = jobList;
+        });
+      } else {
+        print('No users found.');
+      }
+    } catch (e) {
+      print('Error fetching user list: $e');
+    }
+  }
+
+  Future<void> fetchAllLocation() async {
+    try {
+      final response =
+          await Supabase.instance.client.from('location_list').select();
+      if (response.isNotEmpty) {
+        print('Location List: $response');
+        setState(() {
+          locationList = (response as List)
+              .map((data) => LocationList.fromJson(data))
+              .toList();
+        _ownerController.locationList.value = locationList;
+        });
+      } else {
+        print('No users found.');
+      }
+    } catch (e) {
+      print('Error fetching user list: $e');
+    }
   }
 
   @override
@@ -149,6 +197,101 @@ class _HomeState extends State<UserList> {
                         ),
                       ),
                     ),
+                    Spacer(),
+                   signUpType == "Owner" ?  GestureDetector(
+                      onTap: () {
+                        MaidFilterBottomsheet()
+                            .filterMultipleStatusBottomsheet(
+                                context: context,
+                                title: "filter",
+                                jobList: jobList,
+                                locationList: locationList,
+                                onFilter: (jobType, price, location, time) {
+                                  int maxPrice = 0;
+                                  int minPrice = 0;
+
+                                  // Price logic
+                                  if (price != null && price.contains(' - ')) {
+                                    List<String> priceRange = price
+                                        .split(' - ')
+                                        .map((e) => e.trim())
+                                        .toList();
+                                    if (priceRange.length == 2) {
+                                      minPrice = int.tryParse(priceRange[0]) ??
+                                          0; // Default to 0 if parsing fails
+                                      maxPrice = int.tryParse(priceRange[1]) ??
+                                          0; // Default to 0 if parsing fails
+                                    }
+                                  } else if (price != null &&
+                                      price.contains('and Below')) {
+                                    String priceString =
+                                        price.split(' and Below')[0].trim();
+                                    maxPrice = int.tryParse(priceString) ?? 0;
+                                  } else if (price != null &&
+                                      price.contains('and above')) {
+                                    String priceString =
+                                        price.split(' and above')[0].trim();
+                                    minPrice = int.tryParse(priceString) ?? 0;
+                                    maxPrice =
+                                        100000000; // Arbitrary large number for "above" condition
+                                  }
+
+                                  // Filter logic
+                                  setState(() {
+                                    userList = _ownerController.userList.value
+                                        .where((job) {
+                                      bool matchesJobType = (jobType != null &&
+                                              jobType.isNotEmpty)
+                                          ? (job.jobType.contains(jobType ??
+                                              '')) // If jobType is available, filter based on jobType
+                                          : true; // Otherwise, ignore jobType in the filter
+
+                                      bool matchesPrice =
+                                          (price != null && price.isNotEmpty)
+                                              ? (job.price != null) &&
+                                                  job.price! >= minPrice &&
+                                                  job.price! <= maxPrice
+                                              : true;
+
+                                      bool matchesLocation = (location !=
+                                                  null &&
+                                              location.isNotEmpty)
+                                          ? (job.city ?? '').contains(location ??
+                                              '') // Match location if provided
+                                          : true; // Ignore location filter if it's empty or null
+
+                                      bool matchesTime = (time != null &&
+                                              time.isNotEmpty)
+                                          ? (job.availableTime ?? '') ==
+                                              time // If time is provided, match the time
+                                          : true; // Otherwise, ignore time in the filter
+
+                                      return matchesJobType &&
+                                          matchesPrice &&
+                                          matchesLocation &&
+                                          matchesTime;
+                                    }).toList();
+                                  });
+
+                                  print("object data   ${filteredJobs}");
+                                },
+                                onClear: () {
+                                  setState(
+                                    () {
+                                      WidgetsBinding.instance
+                                          .addPostFrameCallback((timeStamp) {
+                                        fetchAllUsers(signUpType);
+                                      });
+                                    },
+                                  );
+                                });
+                      },
+                      child: Icon(
+                        Icons.filter_list,
+                        size: SizeConstant.getHeightWithScreen(26),
+                        color: ColorConstant.black.withOpacity(0.88),
+                      ),
+                    ) : const SizedBox(),
                   ],
                 ),
               ),
