@@ -167,7 +167,8 @@ class _HomeState extends State<Home> with RouteAware {
                 left: SizeConstant.getHeightWithScreen(15),
                 right: SizeConstant.getHeightWithScreen(15)),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(
                   height: MediaQuery.of(context).viewPadding.top,
@@ -247,9 +248,26 @@ class _HomeState extends State<Home> with RouteAware {
                     ],
                   ),
                 ),
+                SizedBox(height: SizeConstant.getHeightWithScreen(20)),
+                Padding(
+                  padding: EdgeInsets.only(
+                      left: SizeConstant.getHeightWithScreen(15)),
+                  child: Text(
+                    Strings.requestList,
+                    style: TextStyle(
+                      color:
+                      ColorConstant.black.withOpacity(0.88),
+                      fontSize: SizeConstant.largeFont,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                SizedBox(height: SizeConstant.getHeightWithScreen(20)),
                 userList.isNotEmpty
                     ? Expanded(
                         child: ListView.builder(
+                          shrinkWrap: true,
+                          padding: EdgeInsets.zero,
                           itemCount: userList.length,
                           itemBuilder: (context, index) {
                             final job = userList[index];

@@ -162,7 +162,7 @@ class _OwnerDashboardState extends State<OwnerDashboard> with RouteAware {
       child: SafeArea(
         top: false,
         child: Scaffold(
-          backgroundColor: ColorConstant.white,
+          backgroundColor: ColorConstant.backgroundColor,
           floatingActionButton: FloatingActionButton(
             backgroundColor: ColorConstant.primaryColor,
             onPressed: () {
@@ -178,6 +178,8 @@ class _OwnerDashboardState extends State<OwnerDashboard> with RouteAware {
             ),
           ),
           body: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(
                 height: MediaQuery.of(context).viewPadding.top,
@@ -253,6 +255,20 @@ class _OwnerDashboardState extends State<OwnerDashboard> with RouteAware {
                       ],
                     )
                   ],
+                ),
+              ),
+              SizedBox(height: SizeConstant.getHeightWithScreen(20)),
+              Padding(
+                padding: EdgeInsets.only(
+                    left: SizeConstant.getHeightWithScreen(15)),
+                child: Text(
+                  Strings.requestList,
+                  style: TextStyle(
+                    color:
+                    ColorConstant.black.withOpacity(0.88),
+                    fontSize: SizeConstant.largeFont,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
               SizedBox(height: SizeConstant.getHeightWithScreen(20)),
