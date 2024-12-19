@@ -34,6 +34,7 @@ class _SignUpState extends State<SignUp> {
   String imageUrl = "";
   List<String> resultId = [];
   String jobResult = "";
+  String cityResult = "";
   List<JobList> jobList = [];
   String resultlocationId = "";
   String locationResult = "";
@@ -511,7 +512,7 @@ class _SignUpState extends State<SignUp> {
                                               MainAxisAlignment.center,
                                           children: [
                                             Text(
-                                              "Enter city",
+                                              "City",
                                               style: TextStyle(
                                                   fontSize:
                                                       SizeConstant.mediumFont,
@@ -520,7 +521,7 @@ class _SignUpState extends State<SignUp> {
                                                   fontWeight: FontWeight.w300),
                                             ),
                                             Text(
-                                              jobResult,
+                                              cityResult,
                                               style: TextStyle(
                                                   fontSize:
                                                       SizeConstant.smallFont,
@@ -808,7 +809,7 @@ class _SignUpState extends State<SignUp> {
     if (result != null) {
       int index = int.parse(result);
       setState(() {
-        jobResult = locationList[index].locationName;
+        cityResult = locationList[index].locationName;
         resultlocationId = locationList[index].id.toString();
         _loginController.cityController.text = locationList[index].locationName;
       });

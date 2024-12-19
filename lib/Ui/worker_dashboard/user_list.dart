@@ -418,7 +418,7 @@ class _HomeState extends State<UserList> {
                                                       .getHeightWithScreen(2),
                                                 ),
                                                 Text(
-                                                  "Price : ${job.price == null ? "0" : job.price.toString()} Rs/hr",
+                                                  "Price : ${job.price == 0 ? "-" : '${job.price} Rs/hr'}",
                                                   style: TextStyle(
                                                     overflow:
                                                         TextOverflow.ellipsis,
