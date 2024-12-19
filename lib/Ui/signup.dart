@@ -572,6 +572,8 @@ class _SignUpState extends State<SignUp> {
                                     disabledColor: Colors.grey.withOpacity(0.5), // Optional: visually indicate disabled times
                                     interval: const Duration(minutes: 15), // Optional: 15-minute intervals
                                     use24HourFormat: false, // Optional: 12-hour format
+                                    labelStyle: const TextStyle(fontSize: 16, color: Colors.white),
+                                    timeTextStyle: const TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
                                   );
                                   print(
                                       "result ${timeRange?.startTime} to${timeRange?.endTime}");
