@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -202,19 +203,20 @@ class _LoginState extends State<Login> {
   }
 
   _signup(context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const Text("Dont have an account? "),
-        TextButton(
-            onPressed: () {
+    return RichText(
+      text: TextSpan(
+        text: "Don't have an account? ",
+        style: const TextStyle(color: Colors.black), // Style for the first part
+        children: [
+          TextSpan(
+            text: "Sign Up",
+            style: const TextStyle(color: Colors.purple), // Style for the button text
+            recognizer: TapGestureRecognizer()..onTap = () {
               Get.to(() => const SignUp());
             },
-            child: const Text(
-              "Sign Up",
-              style: TextStyle(color: Colors.purple),
-            ))
-      ],
+          ),
+        ],
+      ),
     );
   }
 }
