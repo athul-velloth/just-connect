@@ -176,7 +176,7 @@ class _SignUpState extends State<SignUp> {
   /// Define disabled time ranges manually
   TimeRange _getDisabledTimeRanges() {
     return TimeRange(
-      startTime: const TimeOfDay(hour: 0, minute: 0), // Midnight to 8:00 AM
+      startTime: const TimeOfDay(hour: 17, minute: 0), // Midnight to 8:00 AM
       endTime: const TimeOfDay(hour: 8, minute: 0),
     );
   }
