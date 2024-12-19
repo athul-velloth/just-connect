@@ -172,6 +172,14 @@ class _SignUpState extends State<SignUp> {
     });
   }
 
+  /// Define disabled time ranges manually
+  TimeRange _getDisabledTimeRanges() {
+    return TimeRange(
+      startTime: const TimeOfDay(hour: 0, minute: 0), // Midnight to 8:00 AM
+      endTime: const TimeOfDay(hour: 8, minute: 0),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -554,118 +562,124 @@ class _SignUpState extends State<SignUp> {
                             ),
                             SizedBox(
                                 height: SizeConstant.getHeightWithScreen(10)),
-                            // InkWell(
-                            //     onTap: () async {
-                            //       timeRange = await showTimeRangePicker(
-                            //         context: context,
-                            //       );
-                            //       print(
-                            //           "result ${timeRange?.startTime} to${timeRange?.endTime}");
-                            //       if (timeRange != null) {
-                            //         setState(() {
-                            //           startTime = timeRange?.startTime;
-                            //           endTime = timeRange?.endTime;
-                            //           _loginController.timeController.text =
-                            //               "${formatTime(startTime)} - ${formatTime(endTime)}";
-                            //         });
-                            //       }
-                            //     },
-                            //     child: Container(
-                            //       width: SizeConstant.getHeightWithScreen(500),
-                            //       padding: EdgeInsets.symmetric(
-                            //           horizontal:
-                            //               SizeConstant.getHeightWithScreen(17),
-                            //           vertical:
-                            //               SizeConstant.getHeightWithScreen(5)),
-                            //       height: SizeConstant.getHeightWithScreen(55),
-                            //       decoration: BoxDecoration(
-                            //           color: Colors.purple.withOpacity(0.1),
-                            //           borderRadius: BorderRadius.circular(
-                            //               SizeConstant.getHeightWithScreen(18)),
-                            //           border: Border.all(
-                            //               color: Colors.purple.withOpacity(0.1),
-                            //               width:
-                            //                   SizeConstant.getHeightWithScreen(
-                            //                       0.1))),
-                            //       child: Text(
-                            //         'Time Range \n${formatTime(startTime)} ${formatTime(endTime)}',
-                            //       ),
-                            //     )),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    _showTimeModal(jobList);
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal:
-                                        SizeConstant.getHeightWithScreen(
-                                            17)),
-                                    height:
-                                    SizeConstant.getHeightWithScreen(55),
-                                    decoration: BoxDecoration(
-                                        color: Colors.purple.withOpacity(0.1),
-                                        borderRadius: BorderRadius.circular(
-                                            SizeConstant.getHeightWithScreen(
-                                                18)),
-                                        border: Border.all(
-                                            color:
-                                            Colors.purple.withOpacity(0.1),
-                                            width: SizeConstant
-                                                .getHeightWithScreen(0.1))),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        // Icon(
-                                        //   Icons
-                                        //       .work, // Replace with your desired icon
-                                        //   size: SizeConstant.getHeightWithScreen(
-                                        //       20), // Adjust icon size
-                                        // ),
-                                        Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              "Time",
-                                              style: TextStyle(
-                                                  fontSize:
-                                                  SizeConstant.mediumFont,
-                                                  color: ColorConstant.black6,
-                                                  fontFamily: "Poppins-Regular",
-                                                  fontWeight: FontWeight.w300),
-                                            ),
-                                            Text(
-                                              timeResult,
-                                              style: TextStyle(
-                                                  fontSize:
-                                                  SizeConstant.smallFont,
-                                                  color: ColorConstant.black3,
-                                                  fontFamily: "Poppins-Medium",
-                                                  fontWeight: FontWeight.w500),
-                                            ),
-                                          ],
-                                        ),
-                                        Icon(
-                                          Icons
-                                              .arrow_drop_down, // Use a down arrow icon
-                                          size:
-                                          SizeConstant.getHeightWithScreen(
-                                              16), // Set size dynamically
-                                          color: Colors
-                                              .black, // Optional: Set color
-                                        )
-                                      ],
-                                    ),
+                            InkWell(
+                                onTap: () async {
+                                  timeRange = await showTimeRangePicker(
+                                    context: context,
+                                    start: const TimeOfDay(hour: 8, minute: 0), // Default start selection
+                                    end: const TimeOfDay(hour: 17, minute: 0), // Default end selection
+                                    disabledTime: _getDisabledTimeRanges(),
+                                    disabledColor: Colors.grey.withOpacity(0.5), // Optional: visually indicate disabled times
+                                    interval: const Duration(minutes: 15), // Optional: 15-minute intervals
+                                    use24HourFormat: false, // Optional: 12-hour format
+                                  );
+                                  print(
+                                      "result ${timeRange?.startTime} to${timeRange?.endTime}");
+                                  if (timeRange != null) {
+                                    setState(() {
+                                      startTime = timeRange?.startTime;
+                                      endTime = timeRange?.endTime;
+                                      _loginController.timeController.text =
+                                          "${formatTime(startTime)} - ${formatTime(endTime)}";
+                                    });
+                                  }
+                                },
+                                child: Container(
+                                  width: SizeConstant.getHeightWithScreen(500),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal:
+                                          SizeConstant.getHeightWithScreen(17),
+                                      vertical:
+                                          SizeConstant.getHeightWithScreen(5)),
+                                  height: SizeConstant.getHeightWithScreen(55),
+                                  decoration: BoxDecoration(
+                                      color: Colors.purple.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(
+                                          SizeConstant.getHeightWithScreen(18)),
+                                      border: Border.all(
+                                          color: Colors.purple.withOpacity(0.1),
+                                          width:
+                                              SizeConstant.getHeightWithScreen(
+                                                  0.1))),
+                                  child: Text(
+                                    'Time Range \n${formatTime(startTime)} ${formatTime(endTime)}',
                                   ),
-                                ),
-                              ],
-                            ),
+                                )),
+                            // Column(
+                            //   crossAxisAlignment: CrossAxisAlignment.stretch,
+                            //   children: [
+                            //     GestureDetector(
+                            //       onTap: () {
+                            //         _showTimeModal(jobList);
+                            //       },
+                            //       child: Container(
+                            //         padding: EdgeInsets.symmetric(
+                            //             horizontal:
+                            //             SizeConstant.getHeightWithScreen(
+                            //                 17)),
+                            //         height:
+                            //         SizeConstant.getHeightWithScreen(55),
+                            //         decoration: BoxDecoration(
+                            //             color: Colors.purple.withOpacity(0.1),
+                            //             borderRadius: BorderRadius.circular(
+                            //                 SizeConstant.getHeightWithScreen(
+                            //                     18)),
+                            //             border: Border.all(
+                            //                 color:
+                            //                 Colors.purple.withOpacity(0.1),
+                            //                 width: SizeConstant
+                            //                     .getHeightWithScreen(0.1))),
+                            //         child: Row(
+                            //           mainAxisAlignment:
+                            //           MainAxisAlignment.spaceBetween,
+                            //           children: [
+                            //             // Icon(
+                            //             //   Icons
+                            //             //       .work, // Replace with your desired icon
+                            //             //   size: SizeConstant.getHeightWithScreen(
+                            //             //       20), // Adjust icon size
+                            //             // ),
+                            //             Column(
+                            //               crossAxisAlignment:
+                            //               CrossAxisAlignment.start,
+                            //               mainAxisAlignment:
+                            //               MainAxisAlignment.center,
+                            //               children: [
+                            //                 Text(
+                            //                   "Time",
+                            //                   style: TextStyle(
+                            //                       fontSize:
+                            //                       SizeConstant.mediumFont,
+                            //                       color: ColorConstant.black6,
+                            //                       fontFamily: "Poppins-Regular",
+                            //                       fontWeight: FontWeight.w300),
+                            //                 ),
+                            //                 Text(
+                            //                   timeResult,
+                            //                   style: TextStyle(
+                            //                       fontSize:
+                            //                       SizeConstant.smallFont,
+                            //                       color: ColorConstant.black3,
+                            //                       fontFamily: "Poppins-Medium",
+                            //                       fontWeight: FontWeight.w500),
+                            //                 ),
+                            //               ],
+                            //             ),
+                            //             Icon(
+                            //               Icons
+                            //                   .arrow_drop_down, // Use a down arrow icon
+                            //               size:
+                            //               SizeConstant.getHeightWithScreen(
+                            //                   16), // Set size dynamically
+                            //               color: Colors
+                            //                   .black, // Optional: Set color
+                            //             )
+                            //           ],
+                            //         ),
+                            //       ),
+                            //     ),
+                            //   ],
+                            // ),
                           ],
                         )
                       : const SizedBox(),
