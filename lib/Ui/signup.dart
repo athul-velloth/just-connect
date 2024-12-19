@@ -34,9 +34,11 @@ class _SignUpState extends State<SignUp> {
   String imageUrl = "";
   List<String> resultId = [];
   String jobResult = "";
+  String timeResult = "";
   String cityResult = "";
   List<JobList> jobList = [];
   String resultlocationId = "";
+  String resultTimeId = "";
   String locationResult = "";
   List<LocationList> locationList = [];
   TimeRange? timeRange;
@@ -252,6 +254,8 @@ class _SignUpState extends State<SignUp> {
                           _loginController.cityController.clear();
                           _loginController.timeController.clear();
                           jobResult = "";
+                          timeResult = "";
+                          resultTimeId = "";
                           resultId = [];
                           locationResult = "";
                           resultlocationId = "";
@@ -289,6 +293,8 @@ class _SignUpState extends State<SignUp> {
                           _loginController.cityController.clear();
                           _loginController.timeController.clear();
                           jobResult = "";
+                          timeResult = "";
+                          resultTimeId = "";
                           resultId = [];
                           imageUrl = "";
                           locationResult = "";
@@ -548,43 +554,118 @@ class _SignUpState extends State<SignUp> {
                             ),
                             SizedBox(
                                 height: SizeConstant.getHeightWithScreen(10)),
-                            InkWell(
-                                onTap: () async {
-                                  timeRange = await showTimeRangePicker(
-                                    context: context,
-                                  );
-                                  print(
-                                      "result ${timeRange?.startTime} to${timeRange?.endTime}");
-                                  if (timeRange != null) {
-                                    setState(() {
-                                      startTime = timeRange?.startTime;
-                                      endTime = timeRange?.endTime;
-                                      _loginController.timeController.text =
-                                          "${formatTime(startTime)} - ${formatTime(endTime)}";
-                                    });
-                                  }
-                                },
-                                child: Container(
-                                  width: SizeConstant.getHeightWithScreen(500),
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal:
-                                          SizeConstant.getHeightWithScreen(17),
-                                      vertical:
-                                          SizeConstant.getHeightWithScreen(5)),
-                                  height: SizeConstant.getHeightWithScreen(55),
-                                  decoration: BoxDecoration(
-                                      color: Colors.purple.withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(
-                                          SizeConstant.getHeightWithScreen(18)),
-                                      border: Border.all(
-                                          color: Colors.purple.withOpacity(0.1),
-                                          width:
-                                              SizeConstant.getHeightWithScreen(
-                                                  0.1))),
-                                  child: Text(
-                                    'Time Range \n${formatTime(startTime)} ${formatTime(endTime)}',
+                            // InkWell(
+                            //     onTap: () async {
+                            //       timeRange = await showTimeRangePicker(
+                            //         context: context,
+                            //       );
+                            //       print(
+                            //           "result ${timeRange?.startTime} to${timeRange?.endTime}");
+                            //       if (timeRange != null) {
+                            //         setState(() {
+                            //           startTime = timeRange?.startTime;
+                            //           endTime = timeRange?.endTime;
+                            //           _loginController.timeController.text =
+                            //               "${formatTime(startTime)} - ${formatTime(endTime)}";
+                            //         });
+                            //       }
+                            //     },
+                            //     child: Container(
+                            //       width: SizeConstant.getHeightWithScreen(500),
+                            //       padding: EdgeInsets.symmetric(
+                            //           horizontal:
+                            //               SizeConstant.getHeightWithScreen(17),
+                            //           vertical:
+                            //               SizeConstant.getHeightWithScreen(5)),
+                            //       height: SizeConstant.getHeightWithScreen(55),
+                            //       decoration: BoxDecoration(
+                            //           color: Colors.purple.withOpacity(0.1),
+                            //           borderRadius: BorderRadius.circular(
+                            //               SizeConstant.getHeightWithScreen(18)),
+                            //           border: Border.all(
+                            //               color: Colors.purple.withOpacity(0.1),
+                            //               width:
+                            //                   SizeConstant.getHeightWithScreen(
+                            //                       0.1))),
+                            //       child: Text(
+                            //         'Time Range \n${formatTime(startTime)} ${formatTime(endTime)}',
+                            //       ),
+                            //     )),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    _showTimeModal(jobList);
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal:
+                                        SizeConstant.getHeightWithScreen(
+                                            17)),
+                                    height:
+                                    SizeConstant.getHeightWithScreen(55),
+                                    decoration: BoxDecoration(
+                                        color: Colors.purple.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(
+                                            SizeConstant.getHeightWithScreen(
+                                                18)),
+                                        border: Border.all(
+                                            color:
+                                            Colors.purple.withOpacity(0.1),
+                                            width: SizeConstant
+                                                .getHeightWithScreen(0.1))),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        // Icon(
+                                        //   Icons
+                                        //       .work, // Replace with your desired icon
+                                        //   size: SizeConstant.getHeightWithScreen(
+                                        //       20), // Adjust icon size
+                                        // ),
+                                        Column(
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              "Time",
+                                              style: TextStyle(
+                                                  fontSize:
+                                                  SizeConstant.mediumFont,
+                                                  color: ColorConstant.black6,
+                                                  fontFamily: "Poppins-Regular",
+                                                  fontWeight: FontWeight.w300),
+                                            ),
+                                            Text(
+                                              timeResult,
+                                              style: TextStyle(
+                                                  fontSize:
+                                                  SizeConstant.smallFont,
+                                                  color: ColorConstant.black3,
+                                                  fontFamily: "Poppins-Medium",
+                                                  fontWeight: FontWeight.w500),
+                                            ),
+                                          ],
+                                        ),
+                                        Icon(
+                                          Icons
+                                              .arrow_drop_down, // Use a down arrow icon
+                                          size:
+                                          SizeConstant.getHeightWithScreen(
+                                              16), // Set size dynamically
+                                          color: Colors
+                                              .black, // Optional: Set color
+                                        )
+                                      ],
+                                    ),
                                   ),
-                                )),
+                                ),
+                              ],
+                            ),
                           ],
                         )
                       : const SizedBox(),
@@ -719,6 +800,8 @@ class _SignUpState extends State<SignUp> {
                           _loginController.cityController.clear();
                           _loginController.timeController.clear();
                           jobResult = "";
+                          timeResult = "";
+                          resultTimeId = "";
                           resultId = [];
                           imageUrl = "";
                           locationResult = "";
@@ -795,6 +878,23 @@ class _SignUpState extends State<SignUp> {
       setState(() {
         jobResult = result.toString();
         resultId = result;
+      });
+    }
+  }
+
+  _showTimeModal(List<JobList> jobList) async {
+    final result = await showModalBottomSheet<String>(
+        context: context,
+        isScrollControlled: true,
+        isDismissible: false,
+        builder: (context) =>
+            TimeSelectionModal(jobList: jobList, resultId: resultTimeId));
+    if (result != null) {
+      int index = int.parse(result);
+      setState(() {
+        timeResult = jobList[index].time;
+        resultTimeId = jobList[index].id.toString();
+        _loginController.timeController.text = jobList[index].time;
       });
     }
   }
@@ -1308,6 +1408,150 @@ class _LocationSelectionModalState extends State<LocationSelectionModal> {
               ],
             )),
       )),
+    ]);
+  }
+}
+
+class TimeSelectionModal extends StatefulWidget {
+  final List<JobList> jobList;
+  final String resultId;
+
+  const TimeSelectionModal(
+      {super.key, required this.jobList, required this.resultId});
+
+  @override
+  State<TimeSelectionModal> createState() => _TimeSelectionModalState();
+}
+
+class _TimeSelectionModalState extends State<TimeSelectionModal> {
+  String selectedRadioValue = 'any'.tr;
+  String selectedNumber = "";
+  List<String> selectedItems = [];
+  @override
+  void initState() {
+    selectedRadioValue = widget.resultId;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(children: [
+      SingleChildScrollView(
+          child: Container(
+            padding: EdgeInsets.only(top: SizeConstant.getHeightWithScreen(50)),
+            color: const Color(0xff757575),
+            child: Container(
+                padding: EdgeInsets.only(top: SizeConstant.getHeightWithScreen(5)),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                        topLeft:
+                        Radius.circular(SizeConstant.getHeightWithScreen(30)),
+                        topRight:
+                        Radius.circular(SizeConstant.getHeightWithScreen(30)))),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    const SizedBox(height: 5.0),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          margin:
+                          const EdgeInsets.only(top: 0, left: 16, right: 10),
+                          child: Text(
+                            "Time List",
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontFamily: "Outfit",
+                                fontWeight: FontWeight.w600,
+                                fontSize: SizeConstant.mediumFont),
+                          ),
+                        ),
+                        IconButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            icon: Icon(
+                              Icons.close,
+                              color: ColorConstant.grey2,
+                              size: SizeConstant.getHeightWithScreen(25),
+                            ))
+                      ],
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(top: 0, bottom: 27),
+                      child: ListView.builder(
+                        padding: EdgeInsets.zero,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: widget.jobList.length,
+                        itemBuilder: (context, index) => GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context, index.toString());
+                          },
+                          child: Container(
+                            margin: EdgeInsets.only(
+                                top: SizeConstant.getHeightWithScreen(10),
+                                left: SizeConstant.getHeightWithScreen(15),
+                                right: SizeConstant.getHeightWithScreen(15)),
+                            padding: EdgeInsets.only(
+                                left: SizeConstant.getHeightWithScreen(16),
+                                right: SizeConstant.getHeightWithScreen(16),
+                                top: SizeConstant.getHeightWithScreen(16),
+                                bottom: SizeConstant.getHeightWithScreen(14)),
+                            decoration: BoxDecoration(
+                                color:
+                                selectedRadioValue == widget.jobList[index].id
+                                    ? ColorConstant.orange4
+                                    : ColorConstant.white,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                    width: SizeConstant.getHeightWithScreen(1),
+                                    color: selectedRadioValue ==
+                                        widget.jobList[index].id
+                                        ? ColorConstant.white
+                                        : ColorConstant.vibBgColor)),
+                            child: Row(
+                              children: [
+                                Radio(
+                                  value: widget.jobList[index].id,
+                                  groupValue: selectedRadioValue,
+                                  materialTapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      Navigator.pop(context, index.toString());
+                                    });
+                                  },
+                                  fillColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                          (Set<MaterialState> states) {
+                                        if (states.contains(MaterialState.selected)) {
+                                          return ColorConstant.primaryColor;
+                                        }
+                                        return ColorConstant.bDisabledColor;
+                                      }),
+                                  visualDensity:
+                                  const VisualDensity(horizontal: -4),
+                                ),
+                                SizedBox(
+                                  width: SizeConstant.getHeightWithScreen(10),
+                                ),
+                                Text(
+                                  widget.jobList[index].time,
+                                  style:
+                                  TextStyle(fontSize: SizeConstant.mediumFont),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                )),
+          )),
     ]);
   }
 }

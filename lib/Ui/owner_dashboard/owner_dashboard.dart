@@ -519,6 +519,9 @@ class _JobSelectionModalState extends State<JobFilterSelectionModal> {
                     borderColor: ColorConstant.white,
                   ),
                 ),
+                const SizedBox(
+                  width: 10,
+                ),
                 Expanded(
                   child: CommonButton(
                     btnHeight: SizeConstant.getHeightWithScreen(48),

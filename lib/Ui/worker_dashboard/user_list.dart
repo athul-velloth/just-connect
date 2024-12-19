@@ -256,7 +256,7 @@ class _HomeState extends State<UserList> {
                                       bool matchesLocation = (location !=
                                                   null &&
                                               location.isNotEmpty)
-                                          ? (job.city ?? '').contains(location ??
+                                          ? (job.city ?? '').contains(location.trim() ??
                                               '') // Match location if provided
                                           : true; // Ignore location filter if it's empty or null
 

@@ -128,16 +128,16 @@ class MaidFilterBottomsheet {
                                         ),
                                       ),
                                     ),
-                                    Text(
-                                      jobList[index].id.toString() ?? "-",
-                                      style: TextStyle(
-                                        overflow: TextOverflow.ellipsis,
-                                        color: ColorConstant.black
-                                            .withOpacity(0.88),
-                                        fontSize: SizeConstant.smallFont,
-                                        fontWeight: FontWeight.w300,
-                                      ),
-                                    ),
+                                    // Text(
+                                    //   jobList[index].id.toString() ?? "-",
+                                    //   style: TextStyle(
+                                    //     overflow: TextOverflow.ellipsis,
+                                    //     color: ColorConstant.black
+                                    //         .withOpacity(0.88),
+                                    //     fontSize: SizeConstant.smallFont,
+                                    //     fontWeight: FontWeight.w300,
+                                    //   ),
+                                    // ),
                                   ],
                                 ),
                               ),
@@ -249,16 +249,16 @@ class MaidFilterBottomsheet {
                                         ),
                                       ),
                                     ),
-                                    Text(
-                                      jobList[index].id.toString() ?? "-",
-                                      style: TextStyle(
-                                        overflow: TextOverflow.ellipsis,
-                                        color: ColorConstant.black
-                                            .withOpacity(0.88),
-                                        fontSize: SizeConstant.smallFont,
-                                        fontWeight: FontWeight.w300,
-                                      ),
-                                    ),
+                                    // Text(
+                                    //   jobList[index].id.toString() ?? "-",
+                                    //   style: TextStyle(
+                                    //     overflow: TextOverflow.ellipsis,
+                                    //     color: ColorConstant.black
+                                    //         .withOpacity(0.88),
+                                    //     fontSize: SizeConstant.smallFont,
+                                    //     fontWeight: FontWeight.w300,
+                                    //   ),
+                                    // ),
                                   ],
                                 ),
                               ),
@@ -385,17 +385,17 @@ class MaidFilterBottomsheet {
                                         ),
                                       ),
                                     ),
-                                    Text(
-                                      locationList[index].id.toString() ??
-                                          "-",
-                                      style: TextStyle(
-                                        overflow: TextOverflow.ellipsis,
-                                        color: ColorConstant.black
-                                            .withOpacity(0.88),
-                                        fontSize: SizeConstant.smallFont,
-                                        fontWeight: FontWeight.w300,
-                                      ),
-                                    ),
+                                    // Text(
+                                    //   locationList[index].id.toString() ??
+                                    //       "-",
+                                    //   style: TextStyle(
+                                    //     overflow: TextOverflow.ellipsis,
+                                    //     color: ColorConstant.black
+                                    //         .withOpacity(0.88),
+                                    //     fontSize: SizeConstant.smallFont,
+                                    //     fontWeight: FontWeight.w300,
+                                    //   ),
+                                    // ),
                                   ],
                                 ),
                               ),
@@ -505,16 +505,16 @@ class MaidFilterBottomsheet {
                                         ),
                                       ),
                                     ),
-                                    Text(
-                                      jobList[index].id.toString() ?? "-",
-                                      style: TextStyle(
-                                        overflow: TextOverflow.ellipsis,
-                                        color: ColorConstant.black
-                                            .withOpacity(0.88),
-                                        fontSize: SizeConstant.smallFont,
-                                        fontWeight: FontWeight.w300,
-                                      ),
-                                    ),
+                                    // Text(
+                                    //   jobList[index].id.toString() ?? "-",
+                                    //   style: TextStyle(
+                                    //     overflow: TextOverflow.ellipsis,
+                                    //     color: ColorConstant.black
+                                    //         .withOpacity(0.88),
+                                    //     fontSize: SizeConstant.smallFont,
+                                    //     fontWeight: FontWeight.w300,
+                                    //   ),
+                                    // ),
                                   ],
                                 ),
                               ),
@@ -838,21 +838,23 @@ class MaidFilterBottomsheet {
                       InkWell(
                         onTap: () {
                           Helper.close();
-                          if ((workerController.selectedStatus.isNotEmpty) ||
-                              (workerController
-                                  .maidTypeCheckChecked.isNotEmpty) ||
-                              (workerController
-                                  .priceTypeCheckChecked.isNotEmpty) ||
-                              (workerController
-                                  .locationTypeCheckChecked.isNotEmpty) ||
-                              (workerController
-                                  .timeTypeCheckChecked.isNotEmpty) ||
-                              (workerController.selectedReportFilter ==
-                                      "Maid Type" &&
-                                  workerController.selectedIndex != -1)) {
-                            workerController.clearReportFilter();
-                            onClear();
-                          }
+                          // if ((workerController.selectedStatus.isNotEmpty) ||
+                          //     (workerController
+                          //         .maidTypeCheckChecked.isNotEmpty) ||
+                          //     (workerController
+                          //         .priceTypeCheckChecked.isNotEmpty) ||
+                          //     (workerController
+                          //         .locationTypeCheckChecked.isNotEmpty) ||
+                          //     (workerController
+                          //         .timeTypeCheckChecked.isNotEmpty) ||
+                          //     (workerController.selectedReportFilter ==
+                          //             "Maid Type" &&
+                          //         workerController.selectedIndex != -1)) {
+                          //   workerController.clearReportFilter();
+                          //   onClear();
+                          // }
+                          workerController.clearReportFilter();
+                          onClear();
                         },
                         child: Container(
                             width: (MediaQuery.of(context).size.width / 2) - 30,
