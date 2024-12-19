@@ -421,6 +421,8 @@ class MaidFilterBottomsheet {
                     interval: const Duration(
                         minutes: 15), // Optional: 15-minute intervals
                     use24HourFormat: false, // Optional: 12-hour format
+                    labelStyle: const TextStyle(fontSize: 16, color: Colors.white),
+                    timeTextStyle: const TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
                   );
                   print(
                       "result ${workerController.timeRange?.startTime} to${workerController.timeRange?.endTime}");
@@ -462,6 +464,8 @@ class MaidFilterBottomsheet {
                           interval: const Duration(
                               minutes: 15), // Optional: 15-minute intervals
                           use24HourFormat: false, // Optional: 12-hour format
+                          labelStyle: const TextStyle(fontSize: 16, color: Colors.white),
+                          timeTextStyle: const TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
                         );
                         print(
                             "result ${workerController.timeRange?.startTime} to${workerController.timeRange?.endTime}");
