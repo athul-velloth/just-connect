@@ -323,7 +323,7 @@ class _HomeState extends State<UserList> {
                                                 : true; // Ignore location filter if it's empty or null
                                             print(
                                                 "object data   ${job.availableTime}      $targetStart  $targetEnd");
-                                           bool matchesTime = true;
+                                            bool matchesTime = true;
                                             if ((targetStart != null &&
                                                 targetStart.isNotEmpty &&
                                                 targetEnd != null &&
@@ -342,7 +342,8 @@ class _HomeState extends State<UserList> {
                                               final targetEnd1 = parseAmPmTime(
                                                   targetEnd.toString());
 
-                                               matchesTime = (targetStart.isNotEmpty &&
+                                              matchesTime = (targetStart
+                                                          .isNotEmpty &&
                                                       targetEnd.isNotEmpty)
                                                   ? timeRangesOverlap(
                                                       jobStart,
@@ -350,9 +351,7 @@ class _HomeState extends State<UserList> {
                                                       targetStart1,
                                                       targetEnd1)
                                                   : true; // Otherwise, ignore time in the filter
-                                            } else {
-                                              
-                                            }
+                                            } else {}
                                             return matchesJobType &&
                                                 matchesPrice &&
                                                 matchesLocation &&
